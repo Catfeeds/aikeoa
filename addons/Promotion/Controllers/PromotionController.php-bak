@@ -1,0 +1,939 @@
+<?php namespace Aike\Promotion\Controllers;
+
+use Input;
+use Request;
+use Validator;
+use URL;
+use DB;
+
+use select;
+
+use Aike\User\User;
+use Aike\Index\Attachment;
+use Aike\Customer\CustomerType;
+use Aike\Promotion\Promotion;
+use Aike\Promotion\PromotionData;
+use Aike\Promotion\PromotionMaterial as Material;
+use Aike\Product\ProductCategory;
+
+use Aike\Index\Controllers\DefaultController;
+
+class PromotionController extends DefaultController
+{
+    public $permission = ['dialog', 'detail', 'cost'];
+
+    /**
+     * 促销列表
+     */
+    public function indexAction($tpl = 'index')
+    {
+        // 客户圈权限
+        $circle = select::circleCustomer();
+
+        $columns = [
+            ['text','promotion.number','促销编号'],
+            ['promotion.type','type_id','促销类型'],
+            ['step','promotion.step_number','流程步骤'],
+            ['date','promotion.start_at','开始日期'],
+            ['date','promotion.end_at','结束日期'],
+            ['cash','promotion.data_18','兑现方式'],
+            ['promotion.material','promotion.material_id','素材'],
+            ['text','user.nickname','客户名称'],
+            ['text','promotion.customer_id','客户编号'],
+        ];
+
+        $columns = array_merge($columns, $circle['columns']);
+ 
+        $search = search_form([
+            'status'   => 0,
+            'referer'  => 1,
+        ], $columns);
+
+        $query = $search['query'];
+
+        $model = Promotion::stepAt()->with('cashs')
+        ->leftJoin('user', 'user.id', '=', 'promotion.customer_id')
+        ->leftJoin('client', 'client.user_id', '=', 'user.id');
+
+        if ($tpl == 'index' || $tpl == 'count') {
+            $model->where('deleted_by', 0);
+        } else {
+            $model->where('deleted_by', '>', 0);
+        }
+
+        if ($query['order'] && $query['srot']) {
+            $model->orderBy($query['srot'], $query['order']);
+        } else {
+            $model->orderBy('promotion.created_at', 'desc');
+        }
+
+        if (is_numeric($query['status'])) {
+            $model->where('promotion.status', $query['status']);
+        }
+
+        if ($circle['whereIn']) {
+            foreach ($circle['whereIn'] as $key => $where) {
+                $model->whereIn($key, $where);
+            }
+        }
+
+        foreach ($search['where'] as $where) {
+            if ($where['active']) {
+                $model->search($where);
+            }
+        }
+
+        $_steps = Promotion::getSteps();
+        $steps = [];
+        foreach ($_steps as $step) {
+            $steps[] = ['id' => $step->number, 'name' => ''.$step->number.'.'.$step->name];
+        }
+
+        $rows = $model->select(['promotion.*','user.nickname'])
+        ->paginate()->appends($query);
+
+        $files = [];
+
+        foreach ($rows as $key => $row) {
+            $files[] = $row['id'];
+
+            $step = get_step_status($row);
+            $row['step']['edit'] = $step['edit'];
+            $rows->put($key, $row);
+        }
+
+        $materialCount = [];
+        $_materials = Material::whereIn('promotion_id', $files)->get();
+        foreach ($_materials as $_material) {
+            $_files = explode(',', $_material['files']);
+            $count  = DB::table('promotion_material_file')->whereIn('id', $_files)->count();
+            $materialCount[$_material['promotion_id']] = $materialCount[$_material['promotion_id']] + $count;
+        }
+        
+        $cashs = array_by(Promotion::$cashs);
+
+        $tabs = [
+            'name'  => 'status',
+            'items' => Promotion::$status,
+        ];
+
+        // 返回json
+        if (Request::wantsJson()) {
+            $json = $rows->toArray();
+            $json['search'] = ['steps' => $steps];
+            return response()->json($json);
+        }
+
+        return $this->display([
+            'search'    => $search,
+            'query'     => $query,
+            'rows'      => $rows,
+            'tabs'      => $tabs,
+            'materials' => Promotion::$materials,
+            'cashs'     => $cashs,
+            'steps'     => $steps,
+            'tpl'       => $tpl,
+            '_materials'=> $materialCount,
+        ], $tpl);
+    }
+
+    // 促销一个月未核销列表
+    public function overdueAction()
+    {
+        // 客户圈权限
+        $circle = select::circleCustomer();
+
+        $date = date('Y-m-d', strtotime('-1 month'));
+
+        $model = Promotion::leftJoin('user', 'user.id', '=', 'promotion.customer_id')
+        ->leftJoin('client', 'client.user_id', '=', 'user.id');
+
+        $model->where('promotion.end_at', '<', $date)
+        ->where('promotion.status', 0);
+
+        $rows = $model->select(['promotion.*','user.nickname'])
+        ->count();
+        
+        return $this->display([]);
+    }
+
+    // 促销汇总
+    public function countAction()
+    {
+        return $this->indexAction('count');
+    }
+
+    // 回收站列表
+    public function trashAction()
+    {
+        return $this->indexAction('trash');
+    }
+
+    /**
+     * 显示促销
+     */
+    public function showAction()
+    {
+        $id = Input::get('id');
+
+        // 获取促销
+        $promotion = Promotion::find($id);
+        $promotion->step_number = $promotion->step_number > 0 ? $promotion->step_number : 1;
+
+        $step_number = $promotion->step_number;
+
+        // 获取流程
+        $step = Promotion::getStep($step_number);
+        $promotion->step = $step;
+
+        // 获取流程办理权限
+        $step = get_step_status($promotion);
+
+        // 获取产品列表
+        $promotion->promotion_data = DB::table('promotion_data')->where('promotion_id', $id)
+        ->orderBy('promotion_data.created_at', 'asc')
+        ->get();
+
+        // 获取草稿附件
+        // $attachment['draft'] = Attachment::draft();
+
+        $auth = auth()->user();
+
+        $form = new \App\Form($promotion, 'promotion', 0, 1);
+
+        $customer = DB::table('user')->find($promotion->customer_id);
+        $salesman = DB::table('user')->find($customer['salesman_id']);
+        $form->data['owner'] = $salesman['nickname'];
+
+        $attach = Attachment::view($promotion['attachment']);
+
+        return $this->display([
+            'form'       => $form,
+            'promotion'  => $promotion,
+            'attach'     => $attach,
+            'step'       => $step,
+        ]);
+    }
+
+    /**
+     * 打印促销
+     */
+    public function printAction()
+    {
+        $id = Input::get('id');
+
+        // 获取促销
+        $promotion = Promotion::find($id);
+        $promotion->step_number = $promotion->step_number > 0 ? $promotion->step_number : 1;
+
+        $step_number = $promotion->step_number;
+
+        // 获取流程
+        $step = Promotion::getStep($step_number);
+        $promotion->step = $step;
+
+        // 获取流程办理权限
+        $step = get_step_status($promotion);
+
+        // 获取产品列表
+        $promotion->promotion_data = DB::table('promotion_data')->where('promotion_id', $id)
+        ->orderBy('promotion_data.created_at', 'asc')
+        ->get();
+
+        // 获取草稿附件
+        // $attachment['draft'] = Attachment::draft();
+
+        $auth = auth()->user();
+
+        $form = new \App\Form($promotion, 'promotion', 0, 1);
+
+        $customer = DB::table('user')->find($promotion->customer_id);
+        $salesman = DB::table('user')->find($customer['salesman_id']);
+        $form->data['owner'] = $salesman['nickname'];
+
+        $this->layout = 'layouts.print';
+        return $this->display([
+            'form'           => $form,
+            'promotion'      => $promotion,
+            'attachment'     => $attachment,
+            'step'           => $step,
+        ]);
+    }
+
+    /**
+     * 新增促销
+     */
+    public function createAction()
+    {
+        $id = Input::get('id');
+
+        // 获取促销
+        $promotion = Promotion::findOrNew($id);
+
+        $promotion['step_number'] = $promotion['step_number'] ?: 1;
+
+        $step_number = $promotion['step_number'];
+
+        // 获取流程
+        $step = Promotion::getStep($step_number);
+        $promotion->step = $step;
+
+        // 获取流程办理权限
+        $step = get_step_status($promotion);
+
+        // 获取产品列表
+        $promotion['promotion_data'] = PromotionData::where('promotion_id', $id)
+        ->orderBy('promotion_data.created_at', 'asc')
+        ->get();
+
+        // 获取草稿附件
+        // $attachment['draft'] = Attachment::draft();
+
+        $auth = auth()->user();
+
+        $form = new \App\Form($promotion, 'promotion', 1);
+        
+        $customer = DB::table('user')->find($promotion->customer_id);
+        $salesman = DB::table('user')->find($customer['salesman_id']);
+        $form->data['owner'] = $salesman['nickname'];
+
+        $attach = Attachment::edit($promotion['attachment']);
+        return $this->display([
+            'form'           => $form,
+            'promotion'      => $promotion,
+            'attach'         => $attach,
+            'step'           => $step,
+        ], 'create');
+    }
+
+    /**
+     * 单品明细
+     */
+    public function detailAction()
+    {
+        $id = Input::get('id');
+
+        // 获取产品列表
+        $rows = PromotionData::where('promotion_id', $id)
+        ->orderBy('promotion_data.created_at', 'asc')
+        ->get();
+
+        return $this->render([
+            'rows' => $rows,
+        ]);
+    }
+
+    /**
+     * 编辑促销
+     */
+    public function editAction()
+    {
+        return $this->createAction();
+    }
+
+    // 回收删除
+    public function deleteAction()
+    {
+        $id = Input::get('id');
+        $id = is_array($id) ? $id : [$id];
+
+        $rows = Promotion::whereIn('id', $id)->get();
+        foreach ($rows as $row) {
+            $data['deleted_at'] = time();
+            $data['deleted_by'] = auth()->id();
+            Promotion::where('id', $row['id'])->update($data);
+        }
+        return $this->success('index', ' 删除成功。');
+    }
+
+    /**
+     * 促销统计
+     */
+    public function reportAction()
+    {
+        // 客户圈权限
+        $circle = select::circleCustomer();
+
+        $columns = [
+            ['date2','p.data_30','批复日期'],
+        ];
+
+        $columns = array_merge($columns, $circle['columns']);
+        
+        $search = search_form([
+            'status'   => 0,
+            'referer'  => 1,
+        ], $columns);
+
+        $query = $search['query'];
+
+        if (Request::wantsJson()) {
+            $model = DB::table('promotion as p')
+            ->leftJoin('customer', 'customer.user_id', '=', 'p.customer_id')
+            ->leftJoin('user as customer_user', 'customer_user.id', '=', 'customer.user_id')
+            ->leftJoin('customer_circle', 'customer.circle_id', '=', 'customer_circle.id')
+            ->where('p.deleted_by', 0)
+            ->groupBy('customer.circle_id')
+            ->selectRaw('customer_circle.name as circle_name, customer.circle_id, SUM(p.data_amount) a, SUM(p.data_amount1) b');
+            
+            if ($circle['whereIn']) {
+                foreach ($circle['whereIn'] as $key => $where) {
+                    $model->whereIn($key, $where);
+                }
+            }
+    
+            foreach ($search['where'] as $where) {
+                if ($where['active']) {
+                    $model->search($where);
+                }
+            }
+            
+            $rows = $model->get();
+            return json_encode($rows);
+        }
+
+        $types = CustomerType::orderBy('id', 'asc')
+        ->get(['id','title as name'])
+        ->keyBy('id')->toArray();
+
+        return $this->display([
+            'search' => $search,
+            'query'  => $query,
+            'types'  => $types,
+        ]);
+    }
+
+    // 回收恢复
+    public function restoreAction()
+    {
+        $id = Input::get('id');
+        $id = is_array($id) ? $id : [$id];
+
+        $rows = Promotion::whereIn('id', $id)->get();
+        foreach ($rows as $row) {
+            $data['deleted_at'] = 0;
+            $data['deleted_by'] = 0;
+            Promotion::where('id', $row['id'])->update($data);
+        }
+        return $this->success('trash', '恢复成功。');
+    }
+
+    // 销毁删除
+    public function destroyAction()
+    {
+        $id = Input::get('id');
+        $id = is_array($id) ? $id : [$id];
+
+        Promotion::whereIn('id', $id)->delete();
+        PromotionData::whereIn('promotion_id', $id)->delete();
+        return $this->success('trash', '销毁成功。');
+    }
+
+    // 获取促销列表
+    public function dialogAction()
+    {
+        $search = search_form([
+            'customer_id' => '',
+            'sort'        => '',
+            'order'       => '',
+            'offset'      => 0,
+            'limit'       => 10,
+        ], [
+            ['text','promotion.number','促销编号'],
+            ['text','user.nickname','客户名称'],
+            ['text','promotion.id','编号'],
+        ]);
+
+        $query = $search['query'];
+
+        if (Request::method() == 'POST') {
+            $model = \Aike\Promotion\Promotion::leftJoin('user', 'user.id', '=', 'promotion.customer_id');
+
+            if ($query['customer_id']) {
+                $model->where('user.id', $query['customer_id']);
+            }
+
+            // 排序方式
+            if ($query['sort'] && $query['order']) {
+                $model->orderBy($query['sort'], $query['order']);
+            }
+
+            // 搜索条件
+            foreach ($search['where'] as $where) {
+                if ($where['active']) {
+                    $model->search($where);
+                }
+            }
+
+            $json['total'] = $model->count();
+            $rows = $model->skip($query['offset'])->take($query['limit'])
+            ->get(['*', 'number as text', 'user.nickname']);
+
+            $json['data'] = $rows;
+            return response()->json($json);
+        }
+        $get = Input::get();
+
+        return $this->render([
+            'search' => $search,
+            'get'    => $get,
+        ]);
+    }
+
+    // 客户本年促销费比(%)
+    public function costAction()
+    {
+        // 本年时间
+        $now_year  = date("Y");
+
+        $id = Input::get('id');
+        $promotion = Promotion::find($id);
+
+        $time_type = Input::get('time_type', 'add_time');
+        $amount_type = ($time_type == 'delivery_time') ? 'fact_amount' : 'amount';
+
+        // 获取品类
+        $_categorys = ProductCategory::orderBy('lft', 'asc')
+        ->where('status', 1)
+        ->where('type', 1)
+        ->get()->toNested();
+
+        $model = DB::table('order_data as i')
+        ->leftJoin('order_type as t', 't.id', '=', 'i.type')
+        ->leftJoin('order as o', 'o.id', '=', 'i.order_id')
+        ->leftJoin('user as c', 'c.id', '=', 'o.customer_id')
+        ->leftJoin('product as p', 'p.id', '=', 'i.product_id')
+        ->where('i.deleted', 0)
+        ->where('o.'.$time_type, '>', 0)
+        ->where('o.customer_id', $promotion->customer_id)
+        ->where('t.type', 1)
+        ->where('o.status', 1)
+        ->whereRaw('FROM_UNIXTIME(o.'.$time_type.',"%Y")=YEAR(CURDATE())')
+        ->groupBy('p.category_id')
+        ->selectRaw('p.category_id, SUM(i.'.$amount_type.' * i.price) as money');
+        $rows = $model->get();
+
+        $categorys = array();
+        foreach ($rows as $row) {
+            // 取得产品类别的定级类别编号
+            $category_id = $_categorys[$row['category_id']]['parent'][0];
+            if ($category_id) {
+                $categorys[$category_id] += $row['money'];
+            }
+        }
+        unset($rows);
+
+        // bd 预估费用， bm 兑现费用
+        $ps = DB::table('promotion as p')
+        ->leftJoin('user as c', 'p.customer_id', '=', 'c.id')
+        ->where('p.deleted_by', 0)
+        ->where('p.customer_id', $promotion->customer_id)
+        ->whereRaw("DATE_FORMAT(p.data_30, '%Y')=?", [date('Y')])
+        ->groupBy('p.type_id')
+        ->selectRaw('p.type_id, SUM(IF(p.data_amount1 > 0, p.data_amount1, p.data_amount)) AS bd, SUM(p.data_amount1) bm')
+        ->get();
+
+        $promotions = DB::table('promotion as p')
+        ->leftJoin('user as c', 'p.customer_id', '=', 'c.id')
+        ->where('p.deleted_by', 0)
+        ->whereRaw("DATE_FORMAT(p.data_30, '%Y')=?", [date('Y')])
+        ->where('p.customer_id', $promotion->customer_id)
+        ->selectRaw('
+            SUM(IF(p.data_amount1_pl > 0, p.data_amount1_pl, p.data_amount_pl)) PL,
+            SUM(IF(p.data_amount1_tc > 0, p.data_amount1_tc, p.data_amount_tc)) TC,
+            SUM(IF(p.data_amount1_pc > 0, p.data_amount1_pc, p.data_amount_pc)) PC,
+            SUM(IF(p.data_amount1_ppc > 0, p.data_amount1_ppc, p.data_amount_ppc)) PPC,
+            SUM(IF(p.data_amount1_hz > 0, p.data_amount1_hz, p.data_amount_hz)) HZ,
+            SUM(IF(p.data_amount1_ql > 0, p.data_amount1_ql, p.data_amount_ql)) QL
+        ')
+        ->first();
+        
+        foreach ($_categorys as $category_id => $category) {
+            if ($category['parent_id'] == 0) {
+                $category_code = strtoupper($category['code']);
+                if ($promotions[$category_code] > 0 && $categorys[$category_id] > 0) {
+                    $_cat_temp = ($promotions[$category_code]/$categorys[$category_id]) * 100;
+                    $_cat_temp = number_format($_cat_temp, 2).'%';
+                } else {
+                    $_cat_temp = '0.00%';
+                }
+                $cat_salesdata_ret[$category_id] = $_cat_temp;
+            }
+        }
+        unset($promotions);
+
+        $promotion = array();
+        if ($ps->count()) {
+            foreach ($ps as $key => $value) {
+                // 本年读已经兑现的促销金额
+                $promotion_honor += $value['bm'];
+                //本年促销分类金额
+                $promotion['cat'][$value['type_id']] = $value['bd'];
+                //本年所有促销金额
+                $promotion['all'] += $value['bd'];
+            }
+        }
+        unset($ps);
+
+        $data_all = array_sum($categorys);
+
+        //本年促销费比(金额)计算
+        if ($data_all > 0) {
+            $promotions_all = ($promotion['all']/$data_all) * 100;
+        }
+        $assess = number_format($promotions_all, 2).'%';
+
+        return $this->render([
+            'cat_salesdata_ret' => $cat_salesdata_ret,
+            'product_categorys' => $_categorys,
+            'categorys'         => $categorys,
+            'promotion'         => $promotion,
+            'promotion_honor'   => $promotion_honor,
+            'assess'            => $assess,
+        ]);
+    }
+
+    // 单品在客户的涨跌情况分析(%)
+    public function riseAction()
+    {
+        $id = Input::get('id');
+        $promotion = Promotion::find($id);
+        $product_ids = PromotionData::where('promotion_id', $id)->pluck('product_id');
+
+        $time_type = Input::get('time_type', 'delivery_time');
+        $amount_type = ($time_type == 'delivery_time') ? 'fact_amount' : 'amount';
+
+        // 往前4个月
+        $month1 = date("Y-m", strtotime("-3 month"));
+        // 往前3个月
+        $month2 = date("Y-m", strtotime("-2 month"));
+        // 提前2个月
+        $month3 = date("Y-m", strtotime("-2 month"));
+        $month4 = date("Y-m", strtotime("-1 month"));
+        
+        $model = DB::table('order_data as i')
+        ->leftJoin('order_type as t', 't.id', '=', 'i.type')
+        ->leftJoin('order as o', 'o.id', '=', 'i.order_id')
+        ->leftJoin('user as c', 'c.id', '=', 'o.customer_id')
+        ->leftJoin('product as p', 'p.id', '=', 'i.product_id')
+        ->where('o.customer_id', $promotion->customer_id)
+        ->whereIn('i.product_id', $product_ids)
+        ->where('i.deleted', 0)
+        ->where('o.'.$time_type, '>', 0)
+        ->whereRaw("FROM_UNIXTIME(o.$time_type,'%Y-%m') BETWEEN '$month1' AND '$month2'")
+        ->where('t.type', 1)
+        ->groupBy('p.id')
+        ->selectRaw('i.product_id,SUM(i.'.$amount_type.' * i.price) money');
+
+        $rows['a'] = $model->get();
+        $rows['a'] = array_by($rows['a'], 'product_id');
+        
+        $model = DB::table('order_data as i')
+        ->leftJoin('order_type as t', 't.id', '=', 'i.type')
+        ->leftJoin('order as o', 'o.id', '=', 'i.order_id')
+        ->leftJoin('user as c', 'c.id', '=', 'o.customer_id')
+        ->leftJoin('product as p', 'p.id', '=', 'i.product_id')
+        ->where('o.customer_id', $promotion->customer_id)
+        ->whereIn('i.product_id', $product_ids)
+        ->where('i.deleted', 0)
+        ->where('o.'.$time_type, '>', 0)
+        ->whereRaw("FROM_UNIXTIME(o.$time_type,'%Y-%m') BETWEEN '$month3' AND '$month4'")
+        ->where('t.type', 1)
+        ->groupBy('p.id')
+        ->selectRaw('i.product_id,SUM(i.'.$amount_type.' * i.price) money');
+
+        $rows['b'] = $model->get();
+        $rows['b'] = array_by($rows['b'], 'product_id');
+
+        $money2 = $money1 = array();
+        if ($rows) {
+            foreach ($rows['b'] as $product_id => $value) {
+                $_temp = $value['money'] - $rows['a'][$product_id]['money'];
+                if ($rows['a'][$product_id]['money'] <> 0) {
+                    $temp = number_format($_temp/$rows['a'][$product_id]['money'], 2);
+                } else {
+                    $temp = '0.00';
+                }
+                $money2['pie'][$product_id] = $money1['pie'][$product_id] = $temp;
+                $money2['money'][$product_id] = $money1['money'][$product_id] = [$_temp, $value['money'], $rows['a'][$product_id]['money']];
+            }
+        }
+        unset($rows);
+        
+        $products = DB::table('product AS p')
+        ->leftJoin('product_category AS b', 'b.id', '=', 'p.category_id')
+        ->where('p.status', 1)
+        ->where('b.type', 1)
+        ->whereIn('p.id', $product_ids)
+        ->groupBy('p.id')
+        ->orderBy('b.lft', 'ASC')
+        ->orderBy('p.sort', 'ASC')
+        ->selectRaw('p.*,b.name AS category_name')
+        ->get();
+        $products = array_by($products);
+        
+        $temp = [];
+        foreach ($products as $product_id => $product) {
+            if ($money1['pie'][$product_id]) {
+                $temp[] = [$product_id, $money1['pie'][$product_id], $product['name'], $product['spec']];
+            }
+        }
+        
+        $pie['a'] = $pie['b'] = $temp;
+        
+        usort($pie['a'], function ($a, $b) {
+            if ($a[1] == $b[1]) {
+                return 0;
+            }
+            return ($a[1] > $b[1]) ? 1 : -1;
+        });
+        
+        usort($pie['b'], function ($a, $b) {
+            if ($a[1] == $b[1]) {
+                return 0;
+            }
+            return ($a[1] < $b[1]) ? 1 : -1;
+        });
+        return $this->render(array(
+            'categorys' => $categorys,
+            'products'  => $products,
+            'rows'      => $pie,
+            'month1'    => $month1,
+            'month2'    => $month2,
+            'month3'    => $month3,
+            'month4'    => $month4,
+            'assess'    => $assess,
+        ));
+    }
+
+    // 导入促销表
+    public function importAction()
+    {
+        // 上传文件
+        if (Request::method() == 'POST') {
+            $file = Input::file('userfile');
+            
+            if ($file->isValid()) {
+                set_time_limit(0);
+        
+                $handle = fopen($file->getPathName(), 'r');
+                $start = microtime(true);
+
+                $clients = User::where('role_id', 2)
+                ->get(['id', 'username'])
+                ->keyBy('username');
+
+                $rows = [];
+
+                while ($data = fgets($handle, 10000)) {
+                    $data = mb_convert_encoding($data, 'utf8', 'gb2312');
+
+                    $data = explode("\t", $data);
+
+                    // 检查文件头
+                    if ($data[0] == '月份') {
+                        continue;
+                    }
+
+                    if ($data[0]) {
+                        // 客户编号
+                        $user = $clients[trim($data[11])];
+                        if (empty($user)) {
+                            return $this->error($data[11].' 客户代码不存在。');
+                        }
+
+                        $row = [];
+
+                        $row['customer_id'] = $user['id'];
+
+                        // 客户名称
+                        //$row['al'] = $data[12];
+
+                        // 促销开始日期
+                        $row['start_at'] = $data[13];
+
+                        // 促销结束日期
+                        $row['end_at'] = $data[14];
+
+                        // 促销对象
+                        $row['data_4'] = $data[15];
+
+                        // 促销目标
+                        $row['data_3'] = $data[16];
+
+                        // 促销类型
+                        $type = ['消费' => 1,'渠道' => 2, '经销' => 3];
+                        $row['type_id'] = $type[trim($data[17])];
+
+                        // 促销单品
+                        $row['product_remark'] = $data[18];
+
+                        // 促销方法
+                        $row['data_5'] = $data[19];
+
+                        // 支持方式
+                        $row['data_10'] = $data[20];
+
+                        // 兑现方式
+                        $row['data_18'] = $data[21] == '现配' ? 1 : 2;
+
+                        // 核销依据
+                        $row['data_19'] = $data[21];
+
+                        $row['data_amount_pl'] = $data[22];
+
+                        $row['data_amount_tc'] = $data[23];
+
+                        $row['data_amount_pc'] = $data[24];
+
+                        $row['data_amount_ppc'] = $data[25];
+
+                        $row['data_amount_hz'] = $data[26];
+
+                        $row['data_amount_ql'] = $data[27];
+
+                        // $row['data_amount_cl'] = $data[28];
+
+                        $row['data_amount'] = $data[29];
+
+                        // 实际兑现费用
+                        /*
+                        $row['bm'] = $data[30];
+
+                        $row['bl'] = $data[31];
+                        $row['bn'] = $data[32];
+                        $row['bo'] = $data[33];
+                        */
+
+                        // 流程编号
+                        $row['step_number'] = $data[34];
+
+                        // 素材状态
+                        $row['material_id'] = $data[35];
+
+                        //$row['br'] = $data[36];
+
+                        if ($row['step_number'] == 9) {
+                            $row['status'] = 1;
+                        }
+
+                        // 促销编号
+                        $row['number'] = $data[37];
+
+                        $row['created_at'] = strtotime($data[13]);
+                        $row['created_by'] = 1;
+                        
+                        $rows[] = $row;
+                    }
+                }
+
+                $update = $insert = 0;
+                foreach ($rows as $sql) {
+                    $r = DB::table('promotion')->where('number', $sql['number'])->first();
+                    if ($r['id']) {
+                        $update ++;
+                        DB::table('promotion')->where('id', $r['id'])->update($sql);
+                    } else {
+                        $insert ++;
+                        DB::table('promotion')->insert($sql);
+                    }
+                }
+                $end = microtime(true) - $start;
+                return $this->success('import', '恭喜你，更新成功，耗时: '.$end.'，新建：'.$insert.'，更新：'.$update);
+            } else {
+                return $this->error('对不起，文件上传失败，错误代码为: '.$file->getError());
+            }
+        }
+        return $this->display();
+    }
+
+    // 导出促销
+    public function exportAction()
+    {
+        set_time_limit(0);
+
+        $columns = [[
+            'name'  => 'region',
+            'index' => 'user.province_id',
+            'label' => '省份',
+        ],[
+            'name'  => 'number',
+            'index' => 'promotion.number',
+            'label' => '促销编号',
+        ],[
+            'name'  => 'nickname',
+            'index' => 'user.nickname',
+            'label' => '客户名称',
+        ],[
+            'name'  => 'circle_name',
+            'index' => 'customer_circle.name as circle_name',
+            'label' => '销售圈',
+        ],[
+            'name'  => 'start_at',
+            'index' => 'promotion.start_at',
+            'label' => '开始日期',
+        ],[
+            'name'  => 'end_at',
+            'index' => 'promotion.end_at',
+            'label' => '结束日期',
+        ],[
+            'name'  => 'products',
+            'label' => '促销单品',
+        ],[
+            'name'  => 'data_3',
+            'index' => 'promotion.data_3',
+            'label' => '促销目标',
+        ],[
+            'name'  => 'data_5',
+            'index' => 'promotion.data_5',
+            'label' => '促销方法',
+        ],[
+            'name'  => 'data_10',
+            'index' => 'promotion.data_10',
+            'label' => '直接销售建议',
+        ],[
+            'name'  => 'data_amount',
+            'index' => 'promotion.data_amount',
+            'label' => '预估费用',
+        ],[
+            'name'  => 'material_id',
+            'index' => 'promotion.material_id',
+            'label' => '素材',
+        ]];
+
+        $_columns = ['promotion.id'];
+        foreach ($columns as $column) {
+            if (is_array($column['index'])) {
+                $_columns = array_merge($_columns, $column['index']);
+            } else {
+                if ($column['index']) {
+                    $_columns[] = $column['index'];
+                }
+            }
+        }
+
+        $model = Promotion::with([
+            'datas' => function ($q) {
+                $q->select('id', 'promotion_id', 'product_name');
+            }
+        ])
+        ->LeftJoin('customer', 'customer.id', '=', 'promotion.customer_id')
+        ->LeftJoin('user', 'user.id', '=', 'customer.user_id')
+        ->LeftJoin('customer_circle', 'customer_circle.id', '=', 'customer.circle_id')
+        ->where('promotion.deleted_by', 0);
+        $rows = $model->get($_columns);
+
+        // 地址数据
+        $regions = DB::table('region')->pluck('name', 'id');
+        // 促销素材审核
+        $materials = option('promotion.material');
+
+        $rows->transform(function ($row) use ($regions, $materials) {
+            $row['products']    = $row->datas->pluck('product_name')->implode(' / ');
+            $row['region']      = $regions[$row['province_id']];
+            $row['material_id'] = $materials[$row['material_id']]['name'];
+            return $row;
+        });
+        writeExcel($columns, $rows, date('y-m-d').'-促销记录');
+    }
+}

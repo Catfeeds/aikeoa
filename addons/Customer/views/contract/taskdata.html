@@ -1,0 +1,28 @@
+<table class="tlist">
+  <tr>
+    <td><div class='title'>客户任务季度完成详情</div></td>
+  </tr>
+</table>
+
+<table class="list">
+<tr class="odd">
+	<td style="width:10%;vertical-align:middle;"><strong style="color:#1F405C;">品类代码</strong></td>
+    {foreach from=$_quarter.pl key=k item=v}
+        <td colspan="3"><strong style="color:#1F405C;">{$k}季度</strong></td>
+    {/foreach}
+</tr>
+
+{foreach from=$m key=k item=v}
+<tr>
+	<td align="right" style="width:12%;">{php echo $categorys[strtoupper($k)]}({php echo strtoupper($k)})</td>
+    {foreach from=$v.percent key=_k item=_v}
+    <td align="right"><span style="color:#669900;">{php echo $v['quarter'][$_k]}</span></td>
+    <td align="right">{$_v}</td>
+    <td align="right"><span style="color:#f00">{php echo $v['money'][$_k]}</span></td>
+    {/foreach}
+</tr>
+{/foreach}
+
+</table>
+
+<input type="button" class="backtrack" value="返回" />

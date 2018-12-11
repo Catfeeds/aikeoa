@@ -1,0 +1,39 @@
+<table class="tlist">
+  <tr>
+    <td><div class='title'>未签合同客户列表</div></td>
+  </tr>
+
+  <tr>
+    <td height="1" background="{$base_url}data/views/home/images/sp_bg.gif" style='padding:0px'></td>
+  </tr>
+
+    <tr>
+        <td align="left">
+            <form id="select" name="select" action="{echo url()}" method="get">
+            {include file=contract/select}
+            <button type="submit" class="btn btn-default btn-sm">过滤</button>
+            </form>
+        </td>
+    </tr>
+
+</table>
+
+<table class="list">
+<tr class="odd">
+    <th align="center" width="40">序号</th>
+    <th align="center" width="60">客户代码</th>
+    <th align="center" width="100">负责人(昵称)</th>
+    <th align="left">客户名称</th>
+</tr>
+{foreach from=$res key=k item=v}
+    <tr>
+        <td align="center">{$n + 1}</td>
+        <td align="center">{$v.username}</td>
+        <td align="center">{$v.nickname}</td>
+        <td align="left">{$v.company_name}</td>
+    </tr>
+{/foreach}
+
+</table>
+
+<a id="btn" href="javascript:history.back();" class="easyui-linkbutton">返回上一页</a>

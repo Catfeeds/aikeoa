@@ -1,0 +1,1 @@
+php artisan queue:listen --delay=3 --sleep=3 --tries=3

@@ -1,0 +1,49 @@
+<table class="tlist">
+  <tr>
+    <td>
+        <div class='title'>任务完成率</div>
+    </td>
+  </tr>
+{if $auth.role != 'customer'}
+    <tr>
+      <td align="left">
+            <form id="select" name="select" action="{echo url()}" method="get">
+                {include file=contract/select}
+                <button type="submit" class="btn btn-default btn-sm">过滤</button>
+            </form>
+      </td>
+    </tr>
+{/if}
+    
+</table>
+
+<table class="list">
+<tr class="odd">
+	<th width="80">客户代码</th>
+    <th>客户全称</th>
+    <th align="center" width="50">1月</th>
+    <th align="center" width="50">2月</th>
+    <th align="center" width="50">3月</th>
+    <th align="center" width="50">4月</th>
+    <th align="center" width="50">5月</th>
+    <th align="center" width="50">6月</th>
+    <th align="center" width="50">7月</th>
+    <th align="center" width="50">8月</th>
+    <th align="center" width="50">9月</th>
+    <th align="center" width="50">10月</th>
+    <th align="center" width="50">11月</th>
+    <th align="center" width="50">12月</th>
+</tr>
+{foreach from=$m key=k item=v}
+<tr>
+	<td align="center"><a href="{echo url('taskdata')}?user_id={$k}">{$users[$k]}</a></td>
+    <td align="left">{$info[$k]}</td>
+    {foreach from=$v.percent key=_k item=_v}
+    <td align="right"><span style="color:#669900;">{php echo $v['quarter'][$_k]}</span><br />{$_v}<br /><span style="color:#f00">{php echo $v['money'][$_k]}</span></td>
+    {/foreach}
+</tr>
+{/foreach}
+
+</table>
+
+<a id="btn" href="javascript:history.back();" class="easyui-linkbutton">返回上一页</a>

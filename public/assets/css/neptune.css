@@ -1,0 +1,81 @@
+.x-body .haeder {
+    background-color: #fff;
+}
+.x-body .ext-logo {
+    float: left;
+    color: #157fcc;
+    text-shadow: 0px 1px 0px #add2ed;
+}
+.x-body .ext-menu {
+    float: right;
+    margin: 15px 10px 0 0;
+}
+.x-body .ext-menu a {
+    color: #157fcc;
+    font-size: 12px;
+}
+
+.x-grid-cell-inner-action-col {
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.x-status-toolbar .x-btn.x-btn-pressed.x-btn-default-toolbar-small {
+    border-color: #126daf;
+    -webkit-border-radius:3px;
+    -moz-border-radius:3px;
+    -ms-border-radius:3px;
+    -o-border-radius:3px;
+    border-radius:3px;
+    padding:3px 3px 3px 3px;
+    border-width:1px;
+    border-style:solid;
+    background-image:none;
+    background-color:#3892d3;
+    background-image:-webkit-gradient(linear,50% 0,50% 100%,color-stop(0%,#4b9cd7),color-stop(50%,#3892d3),color-stop(51%,#358ac8),color-stop(100%,#3892d3));
+    background-image:-webkit-linear-gradient(top,#4b9cd7,#3892d3 50%,#358ac8 51%,#3892d3);
+    background-image:-moz-linear-gradient(top,#4b9cd7,#3892d3 50%,#358ac8 51%,#3892d3);
+    background-image:-o-linear-gradient(top,#4b9cd7,#3892d3 50%,#358ac8 51%,#3892d3);
+    background-image:-ms-linear-gradient(top,#4b9cd7,#3892d3 50%,#358ac8 51%,#3892d3);
+    background-image:linear-gradient(top,#4b9cd7,#3892d3 50%,#358ac8 51%,#3892d3)
+}
+.x-status-toolbar .x-btn-pressed .x-btn-glyph,
+.x-status-toolbar .x-btn-pressed .x-btn-inner {
+    color: #ffffff !important;
+}
+.x-status-toolbar .x-btn-pressed .x-btn-glyph {
+    text-shadow: 0 1px 0 #126daf !important;
+}
+
+.x-viewport table { border-collapse: inherit; }
+
+.x-form-form-item td { border-top: inherit !important; }
+
+a.x-btn:hover { text-decoration: none !important; }
+
+.x-btn-default-toolbar-small .x-btn-glyph,
+.x-btn-default-small .x-btn-glyph {
+    color: #333 !important;
+    font-size: 12px !important;
+    text-shadow: 0 1px 0 #fff;
+}
+.x-linkcolumn .x-btn-glyph {
+    font-size: 12px !important;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 2px 0 0;
+    text-shadow: 0 2px 0 #fff;
+}
+.x-panel-body-default { color: #455157 !important; }
+
+.x-body { color: #58666e !important; background: transparent !important; }
+.x-tool img { vertical-align: baseline !important; }
+.label-turn { color: #fff !important; }
+.x-docked-summary {
+  border: 1px solid silver;
+}
+
+a.x-linkcolumn { text-decoration:none; color:#0e90d2; padding:3px; }
+a:visited.x-linkcolumn { color:#666; }
+a:hover.x-linkcolumn { background:#0e90d2; color:#fff; }
+a:active.x-linkcolumn { background:#0e90d2; color:#fff; }

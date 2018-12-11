@@ -1,0 +1,75 @@
+<?php 
+return [
+    "name" => "管理-现场管理/持续改善",
+    "order" => 16,
+    "version" => "1.0",
+    "description" => "现场管理,持续改善。",
+    "access" => [
+        1 => "本人",
+        2 => "本人和下属",
+        3 => "部门所有人",
+        4 => "所有人"
+    ],
+    "controllers" => [
+        "photo" => [
+            "name" => "现场管理",
+            "actions" => [
+                "index" => [
+                    "name" => "列表",
+                    "access" => 1
+                ],
+                "view" => [
+                    "name" => "查看"
+                ],
+                "add" => [
+                    "name" => "新建"
+                ],
+                "delete" => [
+                    "name" => "删除"
+                ],
+                "share_user" => [
+                    "name" => "分享人"
+                ],
+                "count" => [
+                    "name" => "统计"
+                ],
+                "category" => [
+                    "name" => "类别"
+                ],
+                "category_add" => [
+                    "name" => "类别创建"
+                ],
+                "category_delete" => [
+                    "name" => "类别删除"
+                ]
+            ]
+        ],
+        "improve" => [
+            "name" => "持续改善",
+            "actions" => [
+                "index" => [
+                    "name" => "列表",
+                    "access" => 1
+                ],
+                "view" => [
+                    "name" => "查看"
+                ],
+                "add" => [
+                    "name" => "新建"
+                ],
+                "delete" => [
+                    "name" => "删除"
+                ],
+                "category" => [
+                    "name" => "类别"
+                ],
+                "category_add" => [
+                    "name" => "类别创建"
+                ],
+                "category_delete" => [
+                    "name" => "类别删除"
+                ]
+            ]
+        ]
+    ]
+];

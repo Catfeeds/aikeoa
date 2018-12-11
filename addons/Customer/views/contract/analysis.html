@@ -1,0 +1,142 @@
+<table class="tlist">
+  <tr>
+    <td>
+        <div class='title'>
+            {if $selects.select.type_id == 1}
+                新客户汇总分析(新客户{$new_dealer_count}家, 新客户的销售额占总销售额[{$new_percent}%]
+            {else}
+                {php echo $selects['type'][$type_id]['title']}
+            {/if}
+        </div>
+    </td>
+  </tr>
+
+  <tr>
+    <td height="1" background="{$base_url}data/views/home/images/sp_bg.gif" style='padding:0px'></td>
+  </tr>
+
+    <tr>
+      <td align="left">
+        <form id="select" name="select" action="{echo url()}" method="get">
+            {include file=contract/select}
+            &nbsp;类型:
+            </span>
+            <select id="type_id" name="type_id" data-toggle="redirect" rel="{$query}">
+                {foreach from=$selects.type key=k item=v}
+                    <option value="{$k}"{if $k == $selects.select.type_id} selected{/if}>{$v.desc}</option>
+                {/foreach}
+            </select>
+            <button type="submit" class="btn btn-default btn-sm">过滤</button>
+        </form>
+      </td>
+  </tr>
+</table>
+
+<table class="list">
+<tr class="singerIndex odd" id="singerIndex">
+<th class="odd info center"><strong style="color:#1F405C;">客户代码</th>
+
+{foreach from=$categorys key=k item=v}
+<th class="odd info center"><strong style="color:#1F405C;" title="金额:{php echo $single[$year]['cat'][$k]}">{$single.$k}</th>
+{/foreach}
+
+<th class="odd info center">总销售额</th>
+<th class="odd info center">促销费比</th>
+
+<th class="odd info center">消费促销</th>
+<th class="odd info center">渠道促销</th>
+<th class="odd info center">经销促销</th>
+
+<th class="odd info center">入场费用</th>
+
+<th class="odd info center">K/A卖场</th>
+<th class="odd info center">K/A超市</th>
+<th class="odd info center">K/A便利</th>
+<th class="odd info center">B店</th>
+
+{foreach from=$list key=key item=value}
+
+    {php $value = $single[$year]['money'][$key]}
+
+    <tr>
+    <td rowspan="3" align="left" style="vertical-align:middle;color:#66CC00;font-weight:700;background:#FFFFE9">
+        <a href="{php echo APP_URL}analysis/data/citydata?tag=user_id&id={$key}&year=2012" title="{php echo $single['area'][$key]['client_company_name']}">{php echo $single['area'][$key]['client_company_name']}</a>
+    </td>
+    
+    <!-- 品类列表 -->
+    {foreach from=$categorys key=k item=v}
+    <td align="right">
+        {php echo (int)$value[$k]}
+    </td>
+    {/foreach}
+
+    <!-- 总销售额 -->
+    <td rowspan="2" style="vertical-align:middle;" align="right">{php echo $single[$year]['totalcost'][$key]}</td>
+    <!-- 计算区域促销费比 -->
+    <td rowspan="3" style="vertical-align:middle;" align="right">
+    {if $_ps.area1.$key}
+    <!--{php $c = ($_ps['area1'][$key]/$single[$year]['totalcost'][$key])}-->
+    <!--{php $_c = number_format($c*100, 2)}-->
+    {$_c}%
+    <!--{else}-->
+    0.00%
+    <!--{/if}-->
+    </td>
+
+    <!-- 促销 -->
+    <td rowspan="3" style="vertical-align:middle;" align="right">
+    <a href="{php echo APP_URL}analysis/data/promotions?tag=user_id&id={$key}&category=1">
+    {php echo (int)$_ps['area'][$key]['消费']}
+    [详情]
+    </a>
+    </td>
+    <td rowspan="3" style="vertical-align:middle;" align="right">
+    <a href="{php echo APP_URL}analysis/data/promotions?tag=user_id&id={$key}&category=2">
+    {php echo (int)$_ps['area'][$key]['渠道']}[详情]
+    </a>
+
+    </td>
+    <td rowspan="3" style="vertical-align:middle;" align="right">
+    <a href="{php echo APP_URL}analysis/data/promotions?tag=user_id&id={$key}&category=3">
+    {php echo (int)$_ps['area'][$key]['经销']}
+    [详情]
+    </a>
+    </td>
+
+    <!-- 入场 -->
+    <td rowspan="3" style="vertical-align:middle;" align="right"></td>
+    <td rowspan="3" style="vertical-align:middle;" align="right"></td>
+    <td rowspan="3" style="vertical-align:middle;" align="right"></td>
+    <td rowspan="3" style="vertical-align:middle;" align="right"></td>
+    <td rowspan="3" style="vertical-align:middle;" align="right"></td>
+    </tr>
+
+    <tr>
+    <!-- 品类列表 -->
+        {foreach from=$categorys key=k item=v}
+        <td align="right">
+            {php if($value[$k] > 0 && $single['cat'][$k] > 0):}
+            <!--{php $pl = $value[$k]/$single['cat'][$k]}-->
+            <!--{php $_pl = number_format($pl*100, 2)}-->
+            {$_pl}%
+            {php else:}
+            0.00%
+            {php endif}
+            </td>
+        {/foreach}
+    </tr>
+
+    <!-- 去年同月数据占比 -->
+    <tr>
+
+    {foreach from=$categorys key=k item=v}
+        <td align="right" style="color:#f00">
+        {$oldscale[$key][$k]}%
+        </td>
+    {/foreach}
+    <td style="color:#f00">{$percentage[$key]}%</td>
+
+    </tr>
+{/foreach}
+</table>
+</div>

@@ -1,0 +1,38 @@
+{if $auth.role != 'customer'}
+  <select id='salesman_id' name='salesman_id' data-toggle="redirect" {if $auth.role == 'salesman'} disabled="true" {/if} rel="{$query}">
+    <option value="0">区域</option>
+    {foreach from=$selects.salesman key=k item=v}
+      <option value="{$v.id}"{if $selects.select.salesman_id == $v.id}selected="true"{/if}>{$v.nickname}</option>
+    {/foreach}
+  </select>
+  &nbsp;
+  <select id='province_id' name='province_id' data-toggle="redirect" rel="{$query}">
+    <option value="0">省份</option>
+    {foreach from=$selects.province key=k item=v}
+      <option value="{$v.id}"{if $selects.select.province_id == $v.id}selected="true"{/if}>{$v.name}</option>
+    {/foreach}        
+  </select>      
+  &nbsp;
+  <select id='city_id' name='city_id' data-toggle="redirect" rel="{$query}">
+    <option value="0">城市</option>
+    {foreach from=$selects.city key=k item=v}
+      <option value="{$v.id}"{if $selects.select.city_id == $v.id}selected="true"{/if}>{$v.name}</option>
+    {/foreach}        
+  </select>
+  &nbsp;
+  <select id='customer_id' name='customer_id' data-toggle="redirect" rel="{$query}">
+    <option value="0">客户</option>
+    {foreach from=$selects.customer key=k item=v}
+      <option value="{$v.id}"{if $selects.select.customer_id == $v.id}selected="true"{/if}>{$v.company_name}</option>
+    {/foreach}          
+  </select>
+{/if}
+
+{if isset($selects.select.state)}
+&nbsp;
+<select data-toggle="redirect" id='state' name='state' rel="{$query}">
+    <option value='0'>状态</option>
+    <option value='1' {if $selects.select.state == '1'}selected{/if}>正常</option>
+    <option value='2' {if $selects.select.state == '2'}selected{/if}>过期</option>
+</select>
+{/if}
