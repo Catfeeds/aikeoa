@@ -58,10 +58,10 @@ class Controller extends BaseController
         // 获取配置数据
         $this->setting = Setting::pluck('value', 'key');
 
-        $this->setting['powered'] = $this->powered; 
+        $this->setting['powered'] = $this->powered;
 
         View::share([
-            'title'      => 'Aike OA',
+            'title'      => $this->setting['title'],
             'setting'    => $this->setting,
             'public_url' => URL::to('/'),
             'upload_url' => URL::to('/uploads'),

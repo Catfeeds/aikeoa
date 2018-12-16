@@ -709,7 +709,7 @@ $.jgrid.extend({
 
         // 显示错误信息
         if(cv.length) {
-            $.toastr('error', cv[1], '错误');
+            $.toastr('error', cv[1]);
             // 数据校验失败打开失败的字段编辑器
             $(this).jqGrid("editCell", cv[3], cv[4], true);
             return {data: [], v: false};

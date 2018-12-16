@@ -56,10 +56,10 @@ $('#myform').submit(function() {
     var data = $(this).serialize();
     $.post(url, data, function(res) {
         if(res.status) {
-            $.toastr('success', res.data, '提醒');
+            $.toastr('success', res.data);
             app.redirect('/');
         } else {
-            $.toastr('error', res.data, '提醒');
+            $.toastr('error', res.data);
         }
     }, 'json');
     return false;

@@ -23,20 +23,20 @@
             @endif
         </td>
         <td align="left">
-            {{$row[description]}}
+            {{$row['description']}}
         </td>
         <td align="center">
             {{get_user($row['user_id'], 'nickname')}}
         </td>
         <td align="center">
-            @if($row[step_status] == 'back') 
+            @if($row['step_status'] == 'back') 
                 退回 
             @else
                 审批
             @endif
         </td>
         <td align="center">
-            @datetime($row[deliver_time])
+            @datetime($row['deliver_time'])
         </td>
         <td align="center">
         <?php 

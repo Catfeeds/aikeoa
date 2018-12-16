@@ -122,7 +122,7 @@ function deleteLink(action, title) {
         $.messager.confirm('操作确认', content, function() {
             $.post(app.url('index/notification/' + action), {id: query}, function(res) {
                 if(res.status) {
-                    $.toastr('success', '删除成功。', '提示');
+                    $.toastr('success', '删除成功。');
                     $table.jqGrid('setGridParam', {
                         postData: params,
                         page: 1
@@ -132,7 +132,7 @@ function deleteLink(action, title) {
         });
 
     } else {
-        $.toastr('error', '最少选择一行记录。', '错误');
+        $.toastr('error', '最少选择一行记录。');
     }
 }
 

@@ -83,34 +83,31 @@
 </div>
 
 <div class="panel">
-
-    <div class="panel-heading text-base">
+    <div class="panel-heading text-base b-b">
         <i class="fa fa-comments"></i> 会签意见区
     </div>
-    <!--
-        <ul class="list-group list-group-lg no-bg auto">
-
-          <li class="list-group-item clearfix">
-            <span class="pull-left m-r">
-                <h6>会签步骤 <span class="badge bg-dark">1</span></h6>
-                
-            </span>
-            <span class="clear">
-              <span>管理员 <span class="text-muted">2015-03-18</span> 说</span>
-              <small class="text-muted clear text-ellipsis">我是会签</small>
-            </span>
-          </li>
-
-        </ul>
-        <div class="clearfix panel-footer">
-            <span class="pull-left m-r">
-                <h6>当前步骤 <span class="badge bg-info">{{$work['step_number']}}</span></h6>
-            </span>
-            <span class="clear">
-                <textarea rows="3" name="feedback[content]" placeholder="输入会签内容" class="form-control"></textarea>
-            </span>
-        </div>
-        -->
+    <ul class="list-group list-group-lg no-bg auto">
+        <li class="list-group-item clearfix">
+        <span class="pull-left m-r">
+            <h6>会签步骤 <span class="badge bg-dark">1</span></h6>
+            
+        </span>
+        <span class="clear">
+            <span>管理员 <span class="text-muted">2015-03-18</span> 说</span>
+            <small class="text-muted clear text-ellipsis">我是会签</small>
+        </span>
+        </li>
+    </ul>
+    
+    <div class="clearfix panel-footer">
+        <span class="pull-left m-r">
+            <h6>当前步骤 <span class="badge bg-info">{{$work['step_number']}}</span></h6>
+        </span>
+        <span class="clear">
+            <textarea name="feedback[content]" placeholder="输入会签内容" class="form-control"></textarea>
+        </span>
+    </div>
+    
 </div>
 
 <div class="panel">
@@ -168,9 +165,9 @@ function draft()
     var myform = $('#myform').serialize();
     $.post('{{url("draft")}}', myform, function(res) {
         if (res.status) {
-            $.toastr('success', '草稿保存成功。', '工作保存');
+            $.toastr('success', '草稿保存成功。');
         } else {
-            $.toastr('error', '草稿保存失败。', '工作保存');
+            $.toastr('error', '草稿保存失败。');
         }
     },'json');
 }
@@ -181,7 +178,7 @@ function nextStep()
     $.post('{{url("check")}}', myform, function(res) {
         if (res.status) {
             if (res.data == null) {
-                $.toastr('error', '转交步骤为空，或流程节点类型不正确。', '表单检查');
+                $.toastr('error', '转交步骤为空，或流程节点类型不正确。');
                 return;
             }
 
@@ -206,7 +203,7 @@ function nextStep()
                             if (res1.status) {
                                 location.href = res1.data;
                             } else {
-                                $.toastr('error', res1.data, '工作办理');
+                                $.toastr('error', res1.data);
                             }
                         },'json');
                     }
@@ -221,7 +218,7 @@ function nextStep()
         }
         else
         {
-            $.toastr('error', res.data, '表单检查');
+            $.toastr('error', res.data);
         }
     },'json');
 }
@@ -250,7 +247,7 @@ function lastStep()
                     if (res1.status) {
                         location.href = res1.data;
                     } else {
-                        $.toastr('error', res1.data, '工作办理');
+                        $.toastr('error', res1.data);
                     }
                 },'json');
             }

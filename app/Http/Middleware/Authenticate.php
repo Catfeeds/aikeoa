@@ -50,11 +50,10 @@ class Authenticate
             // 无权限操作
             if (User::authorise() == 0) {
                 $response = '禁止访问('.$request->path().')';
-
                 if ($request->ajax() || $request->wantsJson()) {
                     return response($response, 403);
                 } else {
-                    abort(403, $response);
+                    abort_error($response);
                 }
             }
         }

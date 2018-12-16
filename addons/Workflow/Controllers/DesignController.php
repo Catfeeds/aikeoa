@@ -49,14 +49,14 @@ class DesignController extends DefaultController
     public function addAction()
     {
         $gets = Input::get();
-        $model = Workflow::findOrNew($gets['id']);
-
         if (Request::method() == 'POST') {
             if (empty($gets['title'])) {
                 return $this->error('流程名称必须填写。');
             }
-            $model->fill($gets)->save();
-            return $this->success('index', '工作流程保存成功。');
+            $model = Workflow::findOrNew($gets['id']);
+            $model->fill($gets);
+            $model->save();
+            return $this->json('工作流程保存成功。', 'index');
         }
 
         $row = Workflow::find($gets['id']);

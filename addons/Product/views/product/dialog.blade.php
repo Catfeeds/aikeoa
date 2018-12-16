@@ -204,7 +204,7 @@
         var rows = $table.jqGrid('getSelections');
         if(params.multi == 0) {
             if(rows.length > 1) {
-                $.toastr('error', '只能选择一项。', '错误');
+                $.toastr('error', '只能选择一项。');
                 return false;
             }
         }

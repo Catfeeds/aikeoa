@@ -1,61 +1,58 @@
-<div class="panel">
-
-    <div class="wrapper">
-
-        <div class="pull-right">
-            <a class="btn btn-sm btn-default" href="javascript:optionSort('#myform','{{url('index')}}');"><i class="icon icon-sort-by-order"></i> 排序</a>
-            @if(isset($access['delete']))
-                <a class="btn btn-sm btn-danger" href="javascript:optionDelete('#myform','{{url('delete')}}');"><i class="icon icon-remove"></i> 删除</a>
-            @endif
-        </div>
-
-        @if(isset($access['add']))
-            <a href="{{url('add')}}" class="btn btn-sm btn-info"><i class="icon icon-plus"></i> 新建</a>
-        @endif
-
-    </div>
-
-    <form method="post" id="myform" name="myform">
-    <div class="table-responsive">
-    <table class="table m-b-none b-t table-hover">
-        <thead>
-            <tr>
-                <th>
-                    <input class="select-all" type="checkbox">
-                </th>
-                <th align="left">名称</th>
-                <th align="center">排序</th>
-                <th align="center">ID</th>
-                <th align="center"></th>
-            </tr>
-        </thead>
-        @if($rows)
-        @foreach($rows as $row)
-        <tr>
-            <td align="center">
-                <input class="select-row" type="checkbox" name="id[]" value="{{$row->id}}"@if($row->system == 1) disabled @endif>
-            </td>
-            <td align="left">{{$row['name']}}</td>
-            <td align="center">
-                <input type="text" name="sort[{{$row['id']}}]" class="form-control input-sort" value="{{$row['sort']}}">
-            </td>
-            <td align="center">{{$row['id']}}</td>
-            <td align="center">
-                <a class="option" href="{{url('add',['id'=>$row['id']])}}">编辑</a>
-            </td>
-        </tr>
-        @endforeach
-        @endif
-    </table>
-    </div>
-    </form>
-
-    <div class="panel-footer">
-        <div class="row">
-            <div class="col-sm-1">
-            </div>
-            <div class="col-sm-11 text-right text-center-xs">
-            </div>
-        </div>
+{{$haeder["js"]}}
+<div class="panel b-a" id="{{$haeder['table']}}-controller">
+    @include('tabs2') 
+    @include('haeders')
+    <div class="list-jqgrid">
+        <table id="{{$haeder['table']}}-grid"></table>
+        <div id="{{$haeder['table']}}-grid-page"></div>
     </div>
 </div>
+<script>
+(function($) {
+
+    var table = '{{$haeder["table"]}}';
+    var config = window[table];
+    var action = config.action;
+    var search = config.search;
+
+    // 自定义搜索方法
+    search.searchInit = function(e) {
+        var self = this;
+    }
+    config.grid = $('#' + table + '-grid').jqGrid({
+        caption: '',
+        datatype: 'json',
+        mtype: 'POST',
+        url: '{{url()}}',
+        colModel: config.cols,
+        rowNum: 25,
+        autowidth: true,
+        multiselect: true,
+        viewrecords: true,
+        rownumbers: false,
+        width: '100%',
+        height: getPanelHeight(),
+        footerrow: false,
+        postData: search.advanced.query,
+        pager: '#' + table + '-grid-page',
+        ondblClickRow: function(rowid) {
+            var row = $(this).getRowData(rowid);
+            action.edit(row);
+        },
+        gridComplete: function() {
+            $(this).jqGrid('setColsWidth');
+        }
+    }).on('click', '[data-toggle="event"]', function() {
+        var data = $(this).data();
+        action[data.action](data);
+    });
+    function getPanelHeight() {
+        var list = $('.list-jqgrid').position();
+        return top.iframeHeight - list.top - 98;
+    }
+    $(window).on('resize', function() {
+        config.grid.jqGrid('setGridHeight', getPanelHeight());
+    });
+})(jQuery);
+</script>
+@include('footers')

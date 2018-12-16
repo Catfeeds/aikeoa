@@ -105,14 +105,13 @@
             </div>
         </form>
     </div>
-
+    <!--
     <div class="line line-dashed"></div>
-
     <div class="text-center text-muted">
         <a class="text-base" href="{{url('qrcode')}}">
             <i class="fa fa-qrcode"></i> 扫码登录</a>
     </div>
-
+    -->
     <div class="line line-dashed"></div>
 
     <div class="text-center">
@@ -127,10 +126,10 @@ $('#myform').submit(function () {
     var data = $(this).serialize();
     $.post(url, data, function (res) {
         if (res.status) {
-            $.toastr('success', res.data, '提醒');
+            $.toastr('success', res.data);
             app.redirect('/');
         } else {
-            $.toastr('error', res.data, '提醒');
+            $.toastr('error', res.data);
         }
     }, 'json');
     return false;

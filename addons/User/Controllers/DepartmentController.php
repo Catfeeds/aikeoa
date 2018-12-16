@@ -1,11 +1,14 @@
 <?php namespace Aike\User\Controllers;
 
+use DB;
 use Input;
 use Request;
 use Validator;
 
 use Aike\User\User;
 use Aike\User\Department;
+use Aike\Model\Grid;
+use Aike\Model\Form;
 
 use Aike\Index\Controllers\DefaultController;
 
@@ -15,112 +18,135 @@ class DepartmentController extends DefaultController
     
     public function indexAction()
     {
-        $metaData = [
-            'columns' => [[
-                    'dataIndex' => 'text',
-                    'xtype'     => 'treecolumn',
-                    'flex'      => 1,
-                    'minWidth'  => 200,
-                    'sortable'  => true,
-                    'text'      => '名称',
-                    'search'    => [
-                        'name'  => 'title',
-                        'xtype' => 'textfield',
-                    ],
-                ],[
-                    'dataIndex' => 'description',
-                    'width'     => 200,
-                    'text'      => '描述',
-                ],[
-                    'dataIndex' => 'id',
-                    'sortable'  => true,
-                    'text'      => '编号',
-                    'align'     => 'center',
-                    'width'     => 70,
-                ]
-            ]
-        ];
-        
-        if (Request::method() == 'POST') {
-            $sorts = Input::get('sort');
+        $display = $this->access;
 
-            foreach ($sorts as $id => $sort) {
-                $department = Department::find($id);
-                $department->sort = $sort;
-                $department->save();
+        $haeder = Grid::haeder([
+            'table'   => 'department',
+            'referer' => 1,
+            'search'  => ['by' => ''],
+        ]);
+
+        $cols = $haeder['cols'];
+        $cols = Grid::addCols($cols, 'name', [
+            'label' => '用户数',
+            'name'  => 'user_count',
+            'align' => 'center',
+        ]);
+
+        $cols['actionLink']['options'] = [[
+            'name'    => '编辑',
+            'action'  => 'edit',
+            'display' => $display['edit'],
+        ]];
+
+        $search = $haeder['search_form'];
+        $query = $search['query'];
+
+        if (Request::method() == 'POST') {
+            $model = Department::setBy($haeder);
+            foreach ($haeder['join'] as $join) {
+                $model->leftJoin($join[0], $join[1], $join[2], $join[3]);
             }
-            Department::treeRebuild();
-            return $this->back('恭喜你，操作成功。');
+            $model->leftJoin('user', 'user.department_id', '=', 'department.id');
+            $model->orderBy('department.lft', 'asc');
+
+            foreach ($search['where'] as $where) {
+                if ($where['active']) {
+                    $model->search($where);
+                }
+            }
+
+            $model->select($haeder['select'])
+            ->addSelect(DB::raw('department.parent_id,count(user.id) as user_count'))
+            ->groupBy('department.id');
+
+            $items = $model->get()->toNested();
+            $items = Grid::dataFilter($items, $haeder);
+            return $items->toJson();
         }
 
-        $search = search_form([
-            'referer' => 1,
-        ], []);
-
-        $rows = Department::orderBy('lft', 'asc')->get()->toArray();
-        $rows = array_nest($rows);
+        $haeder['buttons'] = [[
+            'name'    => '删除',
+            'icon'    => 'fa-remove',
+            'action'  => 'delete',
+            'display' => $display['delete']
+        ]];
+        $haeder['cols'] = $cols;
+        $haeder['tabs'] = User::$tabs;
+        $haeder['bys']  = Department::$bys;
+        $haeder['js']   = Grid::js($haeder);
 
         return $this->display([
-            'res'   => $rows,
-            'color' => $color,
+            'haeder' => $haeder,
         ]);
     }
 
-    public function addAction()
+    public function createAction()
     {
-        $gets = Input::get();
-
         if (Request::method() == 'POST') {
-            $rules = [
-                'title' => 'required'
-            ];
-            $v = Validator::make($gets, $rules);
+            $gets = Input::get();
 
+            $rules = Form::rules([
+                'table' => 'department',
+            ]);
+            $v = Validator::make($gets, $rules['rules'], $rules['messages'], $rules['attributes']);
             if ($v->fails()) {
-                return $this->back()->withErrors($v)->withInput();
+                return $this->json($v->errors()->all());
             }
+            $_department = $gets['department'];
+            $department = Department::findOrNew($_department['id']);
 
-            $model = Department::findOrNew($gets['id']);
-            $model->fill($gets)->save();
+            $_department['parent_id'] = (int)$_department['parent_id'];
+            $department->fill($_department)->save();
 
             // 重构树形结构
-            $model->treeRebuild();
-            return $this->success('index', '恭喜您，操作成功。');
+            Department::treeRebuild();
+
+            return $this->json('恭喜您，操作成功。', url_referer('index'));
         }
 
-        $res = Department::find($gets['id']);
+        $id = (int)Input::get('id');
+        $department = Department::find($id);
 
-        return $this->display([
-            'res' => $res,
-        ]);
+        $options = [
+            'table' => 'department',
+        ];
+        if ($department->id) {
+            $options['row'] = $department;
+        }
+        $tpl = Form::make($options);
+        return $this->render([
+            'tpl' => $tpl,
+        ], 'create');
+    }
+
+    public function editAction()
+    {
+        return $this->createAction();
     }
 
     public function dialogAction()
     {
+        $search = search_form([], [
+            ['text','department.title','名称'],
+            ['text','department.id','ID'],
+        ]);
+
         if (Request::method() == 'POST') {
-            $model = \DB::table('department')
-            ->orderBy('lft', 'asc');
-
-            $rows = $model->get(['id', 'title', 'parent_id']);
-            $rows = array_nest($rows, 'title');
-
+            $rows = Department::orderBy('lft', 'asc')->get()->toNested();
+            $data  = [];
             foreach ($rows as $row) {
-                $json[] = [
-                    'id'    => $row['id'],
-                    'sid'   => 'd'.$row['id'],
-                    'title' => $row['title'],
-                    'text'  => $row['layer_space'].$row['title'],
-                ];
+                $row['sid'] = 'd'.$row['id'];
+                $row['text'] = $row['layer_space'].$row['title'];
+                $data[] = $row;
             }
-
-            $json[] = [
+            $data[] = [
                 'id'    => 0,
                 'sid'   => 'all',
                 'title' => '全体人员',
                 'text'  => '全体人员',
             ];
-
-            return response()->json($json);
+            return response()->json(['data' => $data]);
         }
         return $this->render([
             'get' => Input::get()
@@ -134,12 +160,12 @@ class DepartmentController extends DefaultController
             $id = array_filter((array)$id);
 
             if (empty($id)) {
-                return $this->error('最少选择一行记录。');
+                return $this->json('最少选择一行记录。');
             }
 
             $has = Department::whereIn('parent_id', $id)->count();
             if ($has) {
-                return $this->error('存在子节点不允许删除。');
+                return $this->json('存在子节点不允许删除。');
             }
 
             // 删除部门
@@ -148,7 +174,7 @@ class DepartmentController extends DefaultController
             // 重构树形结构
             Department::treeRebuild();
 
-            return $this->back('删除成功。');
+            return $this->json('删除成功。', true);
         }
     }
 }

@@ -25,7 +25,7 @@
                         <div class="h5 m-t-xs m-b-xs"><i class="fa fa-cubes"></i> 模块列表</div>
                     </div>
                     <div class="list-group">
-                        @if($modules)
+                        @if(count($modules))
                         @foreach($modules as $menuKey => $menuValue)
                             <a class="list-group-item" onclick="module('{{$menuKey}}');" href="javascript:;">
                                 <!-- <span class="badge">{{$menuValue['version']}}</span> -->
@@ -41,7 +41,7 @@
 
                 <form method="post" action="{{url('config')}}" class="form-inline" id="myform" name="myform">
                         
-                    @if($modules)
+                    @if(count($modules))
                         @foreach($modules as $menuKey => $menuValue)
 
                         <div class="modules" style="display:none;" id="{{$menuKey}}">
@@ -51,7 +51,7 @@
                                 {{$menuValue['description']}}
                             </div>
 
-                            @if($menuValue['controllers'])
+                            @if(count($menuValue['controllers']))
                             @foreach($menuValue['controllers'] as $groupKey => $groupValue)
                             
                             <div class="panel m-b-sm b-a">
@@ -62,7 +62,7 @@
                                 
                                 <div class="panel-body">
                                     <div class="row">
-                                    @if($groupValue['actions'])
+                                    @if(count($groupValue['actions']))
                                         
                                         @foreach($groupValue['actions'] as $childKey => $childValue)
 
@@ -98,7 +98,7 @@
 
                     <input type="hidden" name="role_id" value="{{$query['role_id']}}">
                     <input type="hidden" name="key" id="key" value="{{$query['key']}}">
-                    <button type="button" onclick="$('#myform').submit();" class="btn btn-success"><i class="fa fa-check-circle"></i> 提交</button>
+                    <button type="button" onclick="$('#myform').submit();" class="btn btn-success"><i class="fa fa-check-circle"></i> 保存设置</button>
                     
                 </form>
             </div>

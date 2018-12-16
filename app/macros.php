@@ -45,16 +45,25 @@ Builder::macro('search', function ($search) {
 
     if ($condition == 'between') {
         $this->whereBetween($search['field'], $value);
+
     } elseif ($search['condition'] == 'date2') {
         $this->whereBetween($search['field'], $value);
+
     } elseif ($search['condition'] == 'second') {
         $this->whereBetween($search['field'], strtotime($value));
+
     } elseif ($search['condition'] == 'second2') {
         $this->whereBetween($search['field'], $value);
+
     } elseif ($condition == 'not_between') {
         $this->whereNotBetween($search['field'], $value);
+
+    } elseif ($condition == 'dialog') {
+        $this->whereIn($search['field'], $value);
+
     } elseif ($condition == 'in') {
         $this->whereIn($search['field'], $value);
+
     } elseif ($search['field'] == 'customer.circle_id') {
         if ($value[0]) {
             $this->where($search['field'], $value[0]);
@@ -62,10 +71,13 @@ Builder::macro('search', function ($search) {
         if ($value[1]) {
             $this->where('customer.id', $value[1]);
         }
+
     } elseif ($condition == 'birthday' || $condition == 'birthbetween') {
         $this->whereRaw('DATE_FORMAT('.$search['field'].',"%m-%d") between ? and ?', $value);
+
     } elseif ($condition == 'pacs') {
         $this->where($search['field'], 'like', '%'. join("\n", $value).'%');
+
     } elseif ($search['field'] == 'user.province_id' || $condition == 'area') {
         if ($value[0]) {
             $this->where('user.province_id', $value[0]);
@@ -76,8 +88,10 @@ Builder::macro('search', function ($search) {
         if ($value[2]) {
             $this->where('user.county_id', $value[2]);
         }
+
     } else {
         $this->where($search['field'], $condition, $value);
+
     }
     return $this;
 });

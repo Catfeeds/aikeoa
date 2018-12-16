@@ -43,7 +43,7 @@
             <select name="field_0" id="search-field-0" class="form-control input-sm">
                 <option data-type="empty" value="">筛选条件</option>
                 @foreach($haeder['search_form']['columns'] as $column)
-                <option data-type="{{$column[0]}}" value="{{$column[1]}}">{{$column[2]}}</option>
+                <option data-type="{{$column['form_type']}}" data-title="{{$column['name']}}" data-url="{{$column['options']['url']}}" value="{{$column['field']}}">{{$column['name']}}</option>
                 @endforeach
             </select>
         </div>
@@ -56,7 +56,7 @@
         
         <div class="btn-group">
             <button id="search-submit" type="submit" class="btn btn-sm btn-default">
-                <i class="fa fa-search"></i></button>
+                <i class="fa fa-search"></i> 搜索</button>
             <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
                 <span class="caret"></span>
                 <span class="sr-only">Toggle Dropdown</span>
@@ -112,26 +112,26 @@
             <div class="wrapper-xs search-form-advanced">
                 <div class="row">
                     @foreach($haeder['search_form']['columns'] as $i => $column)
-                        <?php if($column[0] == 'text2') { continue; } ?>
+                        <?php if($column['form_type'] == 'text2') { continue; } ?>
                         <div class="wrapper-xs">
                             <div class="form-group">
-                                <label class="control-label col-sm-3">{{$column[2]}}</label>
+                                <label class="control-label col-sm-3">{{$column['name']}}</label>
                                 <?php
-                                if (is_array($column[0])) {
-                                    $__type  = $column[0]['type'];
+                                if (is_array($column['form_type'])) {
+                                    $_type = $column['form_type'][0];
                                 } else {
-                                    $__type  = $column[0];
+                                    $_type = $column['form_type'];
                                 }
                                 ?>
-                                <input type="hidden" name="field_{{$i}}" id="search-field-{{$i}}" data-type="{{$__type}}" value="{{$column[1]}}">
+                                <input type="hidden" name="field_{{$i}}" id="advanced-search-field-{{$i}}" data-title="{{$column['name']}}" data-url="{{$column['options']['url']}}" data-type="{{$_type}}" value="{{$column['field']}}">
                             </div>
                             <div class="col-sm-2">
                             <div class="form-group" style="display:none;">
-                                    <select name="condition_{{$i}}" id="search-condition-{{$i}}" class="form-control input-sm"></select>
+                                    <select name="condition_{{$i}}" id="advanced-search-condition-{{$i}}" class="form-control input-sm"></select>
                                 </div>
                             </div>
                             <div class="col-sm-7">
-                                <div class="form-group" id="search-value-{{$i}}"></div>
+                                <div class="form-group" id="advanced-search-value-{{$i}}"></div>
                             </div>
                             <div class="clearfix"></div>
                         </div>

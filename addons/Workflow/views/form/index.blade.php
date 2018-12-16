@@ -83,7 +83,9 @@ var tool = {
             var myform = $('#myform').serialize();
             $.post('{{url()}}', myform, function(res) {
                 if(res.status) {
-                    $.toastr('success', '保存成功。');
+                    $.toastr('success', res.data);
+                } else {
+                    $.toastr('error', res.data);
                 }
             },'json');
 

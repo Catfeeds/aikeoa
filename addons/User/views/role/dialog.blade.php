@@ -3,7 +3,7 @@
         <thead>
         <tr>
             <th data-field="state" data-checkbox="true"></th>
-            <th data-field="text" data-align="left">坝称</th>
+            <th data-field="text" data-align="left">名称</th>
             <th data-field="id" data-width="60" data-align="center">ID</th>
         </tr>
         </thead>
@@ -46,6 +46,7 @@
         $('#'+params.id).val(id.join(','));
         $('#'+params.name).val(text.join(','));
         $('#'+params.id+'_text').text(text.join(','));
+        $('#'+params.id+'_value').val(text.join(','));
     }
 
     function setRow(row)
@@ -75,21 +76,17 @@
         method: 'post',
         url: '{{url()}}',
         height: 350,
-        onLoadSuccess: function(data) {
+        onLoadSuccess: function(res) {
 
             getSelected();
 
             $.each(selected, function(j) {
-                for (var i = 0; i < data.length; i++) {
-                    if(data[i][sid] == j) {
+                for (var i = 0; i < res.data.length; i++) {
+                    if(res.data[i][sid] == j) {
                         $table.bootstrapTable('check', i);
                    }
                 }
             });
-        },
-        onDblClickRow: function(row) {
-            setRow(row);
-            $('#modal-dialog-user').dialog('close');
         },
         onCheck: function(row) {
             setRow(row);

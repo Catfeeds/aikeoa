@@ -46,8 +46,8 @@ class Field extends BaseModel
             'file'         => 'file(文件上传)',
             'files'        => 'files(多文件上传)',
             'address'      => 'address(省市区)',
-            'label'        => 'label(标签)',
             'sn'           => 'sn(流水号)',
+            'custom'       => 'custom(自定义)',
         ];
     }
 
@@ -84,7 +84,7 @@ class Field extends BaseModel
             $str .= '</select>';
         }
         if ($type == 'align') {
-            $items = ['left' => 'left', 'center' => 'center', 'right' => 'right'];
+            $items = ['left' => '左', 'center' => '中', 'right' => '右'];
             $str .= '<select class="form-control input-inline input-sm" name="setting['.$name.']">
             <option value=""> - </option>';
             foreach ($items as $k => $v) {
@@ -114,12 +114,12 @@ class Field extends BaseModel
     public static function form_text($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '行计', 'name' => 'row_count', 'tips' => '用于子表计算，填写字段：field'],
+            ['title' => '总计', 'name' => 'total_count', 'tips' => '用于子表计算，填写字段：field'],
             ['title' => '默认值', 'name' => 'default', 'tips' => ''],
-            ['title' => '行计事件', 'name' => 'row_count', 'tips' => ''],
-            ['title' => '总计事件', 'name' => 'total_count', 'tips' => ''],
         ];
         return Field::tr_texts($setting, $params);
     }
@@ -127,9 +127,9 @@ class Field extends BaseModel
     public static function form_calc($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '默认值', 'name' => 'default', 'tips' => ''],
         ];
         return Field::tr_texts($setting, $params);
@@ -138,17 +138,17 @@ class Field extends BaseModel
     public static function form_auto($setting = [])
     {
         $types = [
-            'sys_date'       => '当前日期，形如 1999-01-01',
-            'sys_date_cn'    => '当前日期，形如 2009年1月1日',
-            'sys_date_cn_s1' => '当前日期，形如 2009年',
-            'sys_date_cn_s2' => '当前年份，形如 2009',
-            'sys_date_cn_s3' => '当前日期，形如 2009年1月',
-            'sys_date_cn_s4' => '当前日期，形如 1月1日',
-            'sys_time'       => '当前时间',
-            'sys_datetime'   => '当前日期+时间',
-            'sys_week'       => '当前星期中的第几天，形如 星期一',
-            'sys_userid'     => '当前用户ID',
-            'sys_nickname'   => '当前用户姓名',
+            'sys_date'                 => '当前日期，形如 1999-01-01',
+            'sys_date_cn'              => '当前日期，形如 2009年1月1日',
+            'sys_date_cn_s1'           => '当前日期，形如 2009年',
+            'sys_date_cn_s2'           => '当前年份，形如 2009',
+            'sys_date_cn_s3'           => '当前日期，形如 2009年1月',
+            'sys_date_cn_s4'           => '当前日期，形如 1月1日',
+            'sys_time'                 => '当前时间',
+            'sys_datetime'             => '当前日期+时间',
+            'sys_week'                 => '当前星期中的第几天，形如 星期一',
+            'sys_userid'               => '当前用户ID',
+            'sys_nickname'             => '当前用户姓名',
             'sys_department_name'      => '当前用户部门',
             'sys_user_position'        => '当前用户职位',
             'sys_user_position_assist' => '当前用户辅助职位',
@@ -161,7 +161,7 @@ class Field extends BaseModel
             ['title' => '类型', 'name' => 'type', 'items' => $types, 'tips' => '', 'type' => 'select'],
             ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '默认值', 'name' => 'default', 'tips' => ''],
         ];
         return Field::tr_texts($setting, $params);
@@ -170,9 +170,9 @@ class Field extends BaseModel
     public static function form_password($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '默认值', 'name' => 'default', 'tips' => ''],
         ];
         return Field::tr_texts($setting, $params);
@@ -181,10 +181,10 @@ class Field extends BaseModel
     public static function form_textarea($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
             ['title' => '高度', 'name' => 'height', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '默认值', 'name' => 'default', 'tips' => ''],
         ];
         return Field::tr_texts($setting, $params);
@@ -193,7 +193,7 @@ class Field extends BaseModel
     public static function form_editor($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
             ['title' => '高度', 'name' => 'height', 'tips' => 'px'],
             ['title' => '类型', 'name' => 'type', 'type' => 'radio', 'items' => [['value' => 1, 'name' => '完整模式'], ['value' => 0, 'name' => '简洁模式']], 'tips' => 'input-inline'],
@@ -205,8 +205,21 @@ class Field extends BaseModel
     public static function form_select($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '选项列表', 'name' => 'content', 'tips' => '格式：选项名称1|选项值1 (回车换行)', 'type' => 'textarea'],
+            ['title' => '默认值', 'name' => 'default', 'tips' => ''],
+        ];
+        return Field::tr_texts($setting, $params);
+    }
+
+    // 自定义
+    public static function form_custom($setting = [])
+    {
+        $params = [
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '方法', 'name' => 'method', 'tips' => ''],
+            ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '默认值', 'name' => 'default', 'tips' => ''],
         ];
         return Field::tr_texts($setting, $params);
@@ -216,19 +229,10 @@ class Field extends BaseModel
     public static function form_address($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '默认值', 'name' => 'default', 'tips' => ''],
-        ];
-        return Field::tr_texts($setting, $params);
-    }
-
-    // 标签
-    public static function form_label($setting = [])
-    {
-        $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
         ];
         return Field::tr_texts($setting, $params);
     }
@@ -237,10 +241,10 @@ class Field extends BaseModel
     public static function form_sn($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '规则', 'name' => 'rule', 'tips' => '格式: {Y}{M}{D}-{SN,4}'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '默认值', 'name' => 'default', 'tips' => ''],
         ];
         return Field::tr_texts($setting, $params);
@@ -256,7 +260,7 @@ class Field extends BaseModel
     public static function form_checkbox($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '选项列表', 'name' => 'content', 'tips' => '格式：选项名称1|选项值1 (回车换行)', 'type' => 'textarea'],
             ['title' => '默认值', 'name' => 'default', 'tips' => ''],
         ];
@@ -267,22 +271,26 @@ class Field extends BaseModel
     public static function form_image($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
-            ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => '高度', 'name' => 'height', 'tips' => 'px'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '路径', 'name' => 'path', 'tips' => '例如: calendar'],
             ['title' => '大小', 'name' => 'size', 'tips' => 'MB'],
         ];
         return Field::tr_texts($setting, $params);
+    }
+
+    // 多文件上传
+    public static function form_images($setting = [])
+    {
+        return Field::form_image();
     }
 
     // 文件上传
     public static function form_file($setting = [])
     {
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '格式', 'name' => 'type', 'tips' => '多个格式以,号分开，如：zip,rar,tar'],
-            ['title' => '文件表名', 'name' => 'table', 'tips' => '例如: attachment'],
-            ['title' => '文件子路径', 'name' => 'path', 'tips' => '例如: calendar'],
+            ['title' => '路径', 'name' => 'path', 'tips' => '例如: calendar'],
             ['title' => '大小', 'name' => 'size', 'tips' => 'MB'],
         ];
         return Field::tr_texts($setting, $params);
@@ -299,9 +307,9 @@ class Field extends BaseModel
     {
         $options = DB::table('option')->where('parent_id', 0)->pluck('name', 'value');
         $params = [
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '数据源', 'name' => 'type', 'items' => $options, 'tips' => '', 'type' => 'select'],
             ['title' => '默认值', 'name' => 'default', 'tips' => '多个选中值以分号分隔“,”，格式：选中值1,选中值2'],
             ['title' => '其他选项', 'name' => 'single', 'tips' => '', 'type' => 'radio', 'items' => [['value' => 1, 'name' => '单选'], ['value' => 0, 'name' => '多选']]],
@@ -328,9 +336,9 @@ class Field extends BaseModel
         $params = [
             ['title' => '数据源', 'name' => 'type', 'items' => $types, 'tips' => '', 'type' => 'select'],
             ['title' => '显示类型', 'name' => 'display', 'items' => $displays, 'tips' => '', 'type' => 'select'],
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '值字段', 'name' => 'id', 'tips' => '格式：此表字段=选项字段'],
             ['title' => '显示字段', 'name' => 'name', 'tips' => '格式：此表字段=选项字段'],
             ['title' => '映射字段', 'name' => 'mapping', 'tips' => '格式：此表字段=选项字段 (回车换行)'],
@@ -352,9 +360,9 @@ class Field extends BaseModel
 
         $params = [
             ['title' => '数据源', 'name' => 'type', 'items' => $types, 'tips' => '', 'type' => 'select'],
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '查询关联字段', 'name' => 'relation', 'tips' => '限制主表字段查询值'],
             ['title' => '映射字段', 'name' => 'mapping', 'tips' => '格式：此表字段=选项字段 (回车换行)'],
             ['title' => '默认值', 'name' => 'default', 'tips' => '多个选中值以分号分隔“,”，格式：选中值1,选中值2'],
@@ -375,11 +383,11 @@ class Field extends BaseModel
 
         $params = [
             ['title' => '数据源', 'name' => 'type', 'items' => $types, 'tips' => '', 'type' => 'select'],
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '查询关联字段', 'name' => 'relation', 'tips' => '限制主表字段查询值'],
-            ['title' => '映射字段', 'name' => 'mapping', 'tips' => '格式：此表字段=选项字段 (回车换行)'],
+            ['title' => '字段映射', 'name' => 'mapping', 'tips' => '格式：此表字段=选项字段 (回车换行)'],
             ['title' => '默认值', 'name' => 'default', 'tips' => '多个选中值以分号分隔","，格式：选中值1,选中值2'],
             ['title' => '其他选项', 'name' => 'single', 'tips' => '', 'type' => 'radio', 'items' => [['value' => 1, 'name' => '单选'], ['value' => 0, 'name' => '多选']]],
         ];
@@ -398,13 +406,11 @@ class Field extends BaseModel
 
         $params = [
             ['title' => '数据源', 'name' => 'type', 'items' => $types, 'tips' => '', 'type' => 'select'],
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
-            ['title' => '值字段', 'name' => 'id', 'tips' => '格式：此表字段=选项字段'],
-            ['title' => '显示字段', 'name' => 'name', 'tips' => '格式：此表字段=选项字段'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'css 样式: input-inline'],
             ['title' => '映射字段', 'name' => 'mapping', 'tips' => '格式：此表字段=选项字段 (回车换行)'],
-            ['title' => '默认值', 'name' => 'default', 'tips' => '多个选中值以分号分隔“,”，格式：选中值1,选中值2'],
+            ['title' => '默认值', 'name' => 'default', 'tips' => '多个选中值以分号分隔","，格式：选中值1,选中值2'],
             ['title' => '其他选项', 'name' => 'single', 'tips' => '', 'type' => 'radio', 'items' => [['value' => 1, 'name' => '单选'], ['value' => 0, 'name' => '多选']]],
         ];
         return Field::tr_texts($setting, $params);
@@ -421,14 +427,10 @@ class Field extends BaseModel
         $types['sql'] = 'SQL';
 
         $params = [
-            //['title' => '数据源', 'name' => 'type', 'items' => $types, 'tips' => '', 'type' => 'select'],
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
-            //['title' => '值字段', 'name' => 'id', 'tips' => '格式：此表字段=选项字段'],
-            //['title' => '显示字段', 'name' => 'name', 'tips' => '格式：此表字段=选项字段'],
-            //['title' => '映射字段', 'name' => 'mapping', 'tips' => '格式：此表字段=选项字段 (回车换行)'],
-            //['title' => '映射字段', 'name' => 'mapping', 'tips' => '格式：此表字段=选项字段 (回车换行)'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '映射字段', 'name' => 'mapping', 'tips' => '格式：此表字段=选项字段 (回车换行)'],
             ['title' => '默认值', 'name' => 'default', 'tips' => '多个选中值以分号分隔“,”，格式：选中值1,选中值2'],
             ['title' => '其他选项', 'name' => 'single', 'tips' => '', 'type' => 'radio', 'items' => [['value' => 1, 'name' => '单选'], ['value' => 0, 'name' => '多选']]],
         ];
@@ -441,9 +443,9 @@ class Field extends BaseModel
         $params = [
             ['title' => '显示格式', 'name' => 'type', 'value' => 'Y-m-d H:i:s', 'tips' => '格式: Y-m-d H:i:s 表示: 2001-02-13 11:20:20'],
             ['title' => '数据格式', 'name' => 'save', 'items' => ['date' => '日期', 'u' => '时间戳'], 'tips' => '', 'type' => 'select'],
-            ['title' => 'Align', 'name' => 'align', 'tips' => '', 'type' => 'align'],
+            ['title' => '对齐', 'name' => 'align', 'tips' => '', 'type' => 'align'],
             ['title' => '宽度', 'name' => 'width', 'tips' => 'px'],
-            ['title' => 'css', 'name' => 'css', 'tips' => 'input-inline'],
+            ['title' => '样式', 'name' => 'css', 'tips' => 'input-inline'],
             ['title' => '默认值', 'name' => 'default', 'tips' => '', 'type' => 'radio', 'items' => [['value' => 1, 'name' => '当前时间'], ['value' => 0, 'name' => '空']]],
         ];
         return Field::tr_texts($setting, $params);
@@ -461,11 +463,6 @@ class Field extends BaseModel
         $attribute = $field['attribute'];
 
         $attribute['class'] = ['form-control','input-sm'];
-
-        if ($field['form_type'] == 'textarea') {
-        } else {
-            // $attribute['class'][] = 'input-inline';
-        }
 
         if ($setting['css']) {
             $attribute['class'][] = $setting['css'];
@@ -507,14 +504,14 @@ class Field extends BaseModel
         return join(' ', $attributes);
     }
 
-    public static function content_label($field, $content = '')
+    /**
+     * 以下函数作用于发布内容部分
+     */
+    public static function content_custom($field, $content = '')
     {
         return $content;
     }
 
-    /**
-     * 以下函数作用于发布内容部分
-     */
     public static function content_text($field, $content = '')
     {
         $field = Field::content_field($field);
@@ -619,9 +616,6 @@ class Field extends BaseModel
 
         $class = ['form-control','input-sm'];
 
-        if ($field['is_read']) {
-            //$class[] = 'readonly';
-        }
         $attribute[] = 'class="'. join(' ', $class).'"';
 
         $attr = join(' ', $attribute);
@@ -709,18 +703,7 @@ class Field extends BaseModel
         $rows = [];
         if ($value) {
             $ids = explode(',', $value);
-            $table = $dialog['table'];
-            $join = $dialog['join'];
-            if ($join) {
-                $rows = DB::table($table)
-                ->LeftJoin('user', 'user.id', '=', $table.'.user_id')
-                ->whereIn($table.'.id', $ids)
-                ->pluck($dialog['field'], $table.'.user_id');
-            } else {
-                $rows = DB::table($table)
-                ->whereIn('id', $ids)
-                ->pluck($dialog['field'], $table.'.id');
-            }
+            $rows = $dialog['model']($ids);
         }
 
         $name = $field['data'];
@@ -802,16 +785,7 @@ class Field extends BaseModel
         $rows = [];
         if ($value) {
             $ids = explode(',', $value);
-            $table = $dialog['table'];
-            $join = $dialog['join'];
-            if ($join) {
-                $rows = DB::table($table)
-                ->LeftJoin('user', 'user.id', '=', $table.'.user_id')
-                ->whereIn($table.'.id', $ids)
-                ->pluck($dialog['field'], $table.'.user_id');
-            } else {
-                $rows = DB::table($table)->whereIn('id', $ids)->pluck($dialog['field'], $table.'.id');
-            }
+            $rows = $dialog['model']($ids);
         }
 
         $name = $field['data'];
@@ -859,30 +833,14 @@ class Field extends BaseModel
         $field   = Field::content_field($field);
         $setting = $field['setting'];
         
-        list($_name, $__name) = explode(':', $setting['name']);
-
         $dialog = Module::dialogs($setting['type']);
 
         $value = $content == 0 ? '' : $content;
 
         $rows = '';
-
         if ($value) {
             $ids = explode(',', $value);
-
-            $table = $dialog['table'];
-            $join  = $dialog['join'];
-
-            if ($join) {
-                $rows = DB::table($table)
-                ->LeftJoin('user', 'user.id', '=', $table.'.user_id')
-                ->whereIn($table.'.id', $ids)
-                ->pluck($dialog['field'])->implode(',');
-            } else {
-                $rows = DB::table($table)
-                ->whereIn('id', $ids)
-                ->pluck($dialog['field'])->implode(',');
-            }
+            $rows = $dialog['model']($ids)->implode(',');
         }
 
         $name = $field['data'];
@@ -1016,8 +974,6 @@ class Field extends BaseModel
         }
 
         $placeholder_text_multiple = '请选择'.$field['name'];
-
-        //$js = '<script>$(function() {$("#'.$id.'").chosenField({placeholder_text_multiple:" - ",width:"'.$width.'"}); });</script>';
 
         $str = $js.'<select ' . Field::content_attribute($field['attribute']) . '>';
         $str .= "<option value=''> - </option>";
@@ -1263,8 +1219,7 @@ class Field extends BaseModel
                 }
             }
 
-            $str .= '</div>
-                <div id="fileDraft_'.$input_id.'">';
+            $str .= '</div><div id="fileDraft_'.$input_id.'">';
 
             if (count($attachment['draft'])) {
                 foreach ($attachment['draft'] as $file) {

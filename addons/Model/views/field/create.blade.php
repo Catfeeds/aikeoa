@@ -95,7 +95,7 @@
 				<option value="UNIQUE" @if($row['index'] == 'UNIQUE') selected @endif>唯一索引</option>
 				<option value="INDEX" @if($row['index'] == 'INDEX') selected @endif>普通索引</option>
 			</select>
-			<span class="help-inline">（可选）请慎重，必须理解索引的概念</span>
+			<span class="help-inline">(可选)请慎重，必须理解索引的概念</span>
 		</div>
 	</div>
 
@@ -106,36 +106,28 @@
 			<span class="help-inline">显示在字段别名下方作为表单输入提示</span>
 		</div>
 	</div>
-	<!--
-	<div class="form-group">
-		<label class="col-sm-2 control-label" for="is_hide">字段隐藏</label>
-		<div class="col-sm-10 control-text">
-			<label class="radio-inline"><input type="radio" @if($row['is_hide'] == 0) checked @endif value="0" name="is_hide"> 否 </label>
-			<label class="radio-inline"><input type="radio" @if($row['is_hide'] == 1) checked @endif value="1" name="is_hide"> 是 </label>
-		</div>
-	</div>
-	-->
+
 	<div class="form-group">
 		<label class="col-sm-2 control-label" for="is_sort">字段排序</label>
 		<div class="col-sm-10 control-text">
-			<label class="radio-inline"><input type="radio" @if($row['is_sort'] == 0) checked @endif value="0" name="is_sort"> 否 </label>
-			<label class="radio-inline"><input type="radio" @if($row['is_sort'] == 1) checked @endif value="1" name="is_sort"> 是 </label>
+			<label class="radio-inline"><input type="radio" @if($row['is_sort'] == '0') checked @endif value="0" name="is_sort"> 否 </label>
+			<label class="radio-inline"><input type="radio" @if($row['is_sort'] == '1') checked @endif value="1" name="is_sort"> 是 </label>
 		</div>
 	</div>
 
 	<div class="form-group">
 		<label class="col-sm-2 control-label" for="is_search">字段搜索</label>
 		<div class="col-sm-10 control-text">
-			<label class="radio-inline"><input type="radio" @if($row['is_search'] == 0) checked @endif value="0" name="is_search"> 否 </label>
-			<label class="radio-inline"><input type="radio" @if($row['is_search'] == 1) checked @endif value="1" name="is_search"> 是 </label>
+			<label class="radio-inline"><input type="radio" @if($row['is_search'] == '0') checked @endif value="0" name="is_search"> 否 </label>
+			<label class="radio-inline"><input type="radio" @if($row['is_search'] == '1') checked @endif value="1" name="is_search"> 是 </label>
 		</div>
 	</div>
 
 	<div class="form-group">
 		<label class="col-sm-2 control-label" for="is_index">列表显示</label>
 		<div class="col-sm-10 control-text">
-			<label class="radio-inline"><input type="radio" @if($row['is_index'] == 0) checked @endif value="0" name="is_index"> 否 </label>
-			<label class="radio-inline"><input type="radio" @if($row['is_index'] == 1) checked @endif value="1" name="is_index"> 是 </label>
+			<label class="radio-inline"><input type="radio" @if($row['is_index'] == '0') checked @endif value="0" name="is_index"> 否 </label>
+			<label class="radio-inline"><input type="radio" @if($row['is_index'] == '1') checked @endif value="1" name="is_index"> 是 </label>
 		</div>
 	</div>
 
@@ -235,8 +227,8 @@ function formType(type)
 }
 function setlength(value) {
 	var type = {
-		BIGINT:'10',
-		INT:'10',
+		BIGINT:'20',
+		INT:'11',
 		MEDIUMINT:'8',
 		SMALLINT:'5',
 		TINYINT:'3',

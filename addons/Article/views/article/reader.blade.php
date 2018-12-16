@@ -12,7 +12,7 @@
             阅读人
         </th>
          <th align="center">
-            角色
+            部门
         </th>
         <th align="center">
             时间
@@ -27,10 +27,10 @@
             {{$row['nickname']}}
         </td>
         <td align="center">
-        {{$row['role']}}
+        {{$row['department_name']}}
         </td>
         <td align="center">
-            @datetime($row[created_at])
+            @datetime($row['created_at'])
         </td>
     </tr>
      @endforeach @endif

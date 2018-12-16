@@ -10,7 +10,7 @@
     <tr>
         <td width="10%" align="right">姓名</td>
         <td width="30%" align="left">
-            <input class="form-control input-inline input-sm" type="text" id="name" name="hr[name]" value="{{$row['name']}}">
+            <input class="form-control input-sm" type="text" id="name" name="hr[name]" value="{{$row['name']}}">
         </td>
         <td width="10%" align="right">系统用户</td>
         <td width="30%" align="left">
@@ -29,7 +29,7 @@
     <tr>
         <td align="right">性别</td>
         <td align="left">
-            <select class="form-control input-inline input-sm" name="hr[gender]" id="gender">
+            <select class="form-control input-sm" name="hr[gender]" id="gender">
                 @foreach(option('user.gender') as $gender)
                     <option value='{{$gender['id']}}' @if($row['gender'] == $gender['id']) selected @endif>{{$gender['name']}}</option>
                 @endforeach
@@ -37,7 +37,7 @@
         </td>
         <td align="right">生日</td>
         <td align="left">
-             <input data-toggle="date" data-format="yyyy-MM-dd" class="form-control input-inline input-sm" type="text" id="birthday" name="hr[birthday]" placeholder="国历" value="{{$row['birthday']}}">
+             <input data-toggle="date" data-format="yyyy-MM-dd" class="form-control input-sm" type="text" id="birthday" name="hr[birthday]" placeholder="国历" value="{{$row['birthday']}}">
         </td>
     </tr>
 
@@ -48,7 +48,7 @@
         </td>
         <td align="right">学历</td>
         <td align="left">
-            <input class="form-control input-inline input-sm" type="text" id="degre" name="hr[degre]" value="{{$row->degre}}">
+            <input class="form-control input-sm" type="text" id="degre" name="hr[degre]" value="{{$row->degre}}">
         </td>
     </tr>
     <tr>
@@ -70,7 +70,7 @@
         <tr>
         <td align="right">职级</td>
         <td align="left">
-            <select class="form-control input-sm input-inline" id='rank_id' name='hr[rank_id]'>
+            <select class="form-control input-sm" id='rank_id' name='hr[rank_id]'>
                 <option value=''> - </option>
                 @foreach(option('hr.rank') as $rank)
                         <option value='{{$rank['id']}}' @if($row['rank_id'] == $rank['id']) selected @endif>{{$rank['name']}}</option>
@@ -79,7 +79,7 @@
         </td>
         <td align="right">工作单元</td>
         <td align="left">
-            <select class="form-control input-sm input-inline" id='unit' name='hr[unit]'>
+            <select class="form-control input-sm" id='unit' name='hr[unit]'>
                 <option value=''> - </option>
                 @foreach(option('hr.unit') as $unit)
                     <option value='{{$unit['id']}}' @if($row->unit == $unit['id']) selected @endif>{{$unit['name']}}</option>
@@ -90,21 +90,21 @@
     <tr>
         <td align="right" width="10%">岗位描述</td>
         <td align="left" width="30%">
-            <input class="form-control input-inline input-sm" type="text" id="position" name="hr[position]" value="{{$row['position']}}">
+            <input class="form-control input-sm" type="text" id="position" name="hr[position]" value="{{$row['position']}}">
         </td>
         <td align="right" width="10%">入职日期</td>
         <td align="left" width="50%">
-            <input data-toggle="date" class="form-control input-inline input-sm" type="text" id="test_date" name="hr[test_date]" value="{{$row['test_date']}}">
+            <input data-toggle="date" class="form-control input-sm" type="text" id="test_date" name="hr[test_date]" value="{{$row['test_date']}}">
         </td>
     </tr>
     <tr>
         <td align="right">转正日期</td>
         <td align="left">
-            <input data-toggle="date" class="form-control input-inline input-sm" type="text" id="job_date" name="hr[job_date]" value="{{$row->job_date}}">
+            <input data-toggle="date" class="form-control input-sm" type="text" id="job_date" name="hr[job_date]" value="{{$row->job_date}}">
         </td>
         <td align="right">员工状态</td>
         <td align="left">
-            <select class="form-control input-inline input-sm" id='status' name='hr[status]'>
+            <select class="form-control input-sm" id='status' name='hr[status]'>
                 @foreach($status as $k => $v)
                     <option value='{{$k}}' @if($row['status'] == $k) selected @endif>{{$v}}</option>
                 @endforeach
@@ -114,7 +114,7 @@
     <tr>
         <td align="right">保险状态</td>
         <td align="left">
-             <select class="form-control input-inline input-sm" name="hr[insurance]" id="insurance">
+             <select class="form-control input-sm" name="hr[insurance]" id="insurance">
                 <option value=''> - </option>
                 @foreach(option('hr.insurance') as $insurance)
                     <option value='{{$insurance['id']}}' @if($row['insurance'] == $insurance['id']) selected @endif>{{$insurance['name']}}</option>

@@ -12,16 +12,26 @@
         var assign   = false;
         var values   = {};
 
+        var _field     = 'search-field-';
+        var _condition = 'search-condition-';
+        var _value     = 'search-value-';
+
+        if (advanced) {
+            _field     = 'advanced-' + _field;
+            _condition = 'advanced-' + _condition;
+            _value     = 'advanced-' + _value;
+        }
+
         function init() {
 
             if(advanced) {
                 $.each(data.field, function(i) {
-                    var type = self.find('#search-field-' + i).data('type');
+                    var type = self.find('#' + _field + i).data('type');
                     setValues(type, i);
                 });
                 
             } else {
-                var e = self.find('#search-field-0');
+                var e = self.find('#' + _field + '0');
                 e.val(data['field'][0]);
                 var type = e.find('option:selected').data('type');
                 setValues(type, 0);
@@ -38,8 +48,8 @@
         function setValues(type, i) {
 
             element[i] = {
-                condition: self.find('#search-condition-'+i),
-                value: self.find('#search-value-'+i)
+                condition: self.find('#' + _condition + i),
+                value: self.find('#' + _value + i)
             };
 
             setCondition(i, type, data['condition'][i] || '');
@@ -120,6 +130,11 @@
                 e.parent('div').hide();
                 var value = 'second2';
 
+            } else if(type == 'dialog') {
+                e.append('<option value="dialog">dialog</option>');
+                e.parent('div').hide();
+                var value = 'dialog';
+
             } else {
                 e.append('<option value="eq">eq</option>');
                 e.parent('div').hide();
@@ -145,7 +160,7 @@
 
         function attr(i, id) {
 
-            var value = 'search-value';
+            var value = _value;
             var name  = 'search';
 
             var res = {};
@@ -158,7 +173,7 @@
                 id_1 = '_' + id;
             }
 
-            res.id   = value + '-' + i + id_0;
+            res.id   = value + i + id_0;
             res.name = name + '_' + i + id_1;
 
             if(assign == false) {
@@ -215,24 +230,42 @@
         self._date2 = function(i, id, space) {
             var a0 = attr(i, 0);
             var a1 = attr(i, 1);
-            var e = $('<input name="'+a0.name+'" id="'+a0.id+'" value="'+a0.value+'" type="text" data-toggle="date" class="form-control input-sm"> - <input name="'+a1.name+'" id="'+a1.id+'" value="'+a1.value+'" type="text" data-toggle="date" class="form-control input-sm">');
+            var e = $('<table class="table"><tr><td><input name="'+a0.name+'" id="'+a0.id+'" value="'+a0.value+'" type="text" data-toggle="date" class="form-control input-sm"></td><td class="date-apart"> - </td><td><input name="'+a1.name+'" id="'+a1.id+'" value="'+a1.value+'" type="text" data-toggle="date" class="form-control input-sm"></td></tr></table>');
             element[i].value.append(e);
         }
 
         self._second2 = function(i, id, space) {
             var a0 = attr(i, 0);
             var a1 = attr(i, 1);
-            var e = $('<input name="'+a0.name+'" id="'+a0.id+'" value="'+a0.value+'" type="text" data-toggle="date" class="form-control input-sm"> - <input name="'+a1.name+'" id="'+a1.id+'" value="'+a1.value+'" type="text" data-toggle="date" class="form-control input-sm">');
+            var e = $('<table class="table"><tr><td><input name="'+a0.name+'" id="'+a0.id+'" value="'+a0.value+'" type="text" data-toggle="date" class="form-control input-sm"></td><td class="date-apart"> - </td><td><input name="'+a1.name+'" id="'+a1.id+'" value="'+a1.value+'" type="text" data-toggle="date" class="form-control input-sm"></td></tr></table>');
             element[i].value.append(e);
         }
-
         self._birthday = function(i, id, space) {
             var a0 = attr(i, 0);
             var a1 = attr(i, 1);
             var e = $('<input name="'+a0.name+'" id="'+a0.id+'" value="'+a0.value+'" type="text" data-toggle="date" data-format="MM-dd" class="form-control input-sm"> - <input name="'+a1.name+'" id="'+a1.id+'" value="'+a1.value+'" type="text" data-toggle="date" data-format="MM-dd" class="form-control input-sm">');
             element[i].value.append(e);
         }
+        self._dialog = function(i, id, space) {
+            var a0 = attr(i, 0);
+            var a1 = attr(i, 1);
 
+            if (advanced) {
+                var field = self.find('#' + _field + i);
+            } else {
+                var field = self.find('#' + _field + '0').find('option:selected');
+            }
+            var options = field.data();
+
+            var e = '<div class="select-group input-group">';
+            var option = "dialogUser('" + options.title + "', '" + options.url + "', '"+ a0.id +"', 1);";
+            e += '<div class="form-control input-sm" style="width:153px;cursor:pointer;" onclick="' + option + '" id="' + a0.id + '_text"></div>';
+            e += '<input type="hidden" id="' + a0.id + '" name="' + a0.name + '" value="' + a0.value +'">';
+            e += '<div class="input-group-btn">';
+            e += '<button type="button" data-toggle="dialog-search-clear" data-id="' + a0.id + '" data-name="' + a0.id + '_text" class="btn btn-sm btn-default"><i class="fa fa-times"></i></button>';
+            e += '</div>';
+            element[i].value.append($(e));
+        }
         self._product_category = function(i, query) {
 
             var category = self.attr(i, 0);
@@ -307,6 +340,9 @@
             birthday: function(i) {
                 self._birthday(i);
             },
+            dialog: function(i) {
+                self._dialog(i);
+            },
             second: function(i) {
                 self._date(i);
             },
@@ -343,7 +379,7 @@
             },
             model_step: function(i, key) {
                 var keys = key.split('.');
-                $.get(app.url('flow/step/steps', {table:keys[1]}),function(res) {
+                $.get(app.url('model/step/steps', {table:keys[1]}),function(res) {
                     self._select(res, i);
                 }, 'json');
             },

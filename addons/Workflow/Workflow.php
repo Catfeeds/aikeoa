@@ -267,7 +267,6 @@ class Workflow extends BaseModel
                 // 写入下一步主办线程
                 DB::table('work_process_data')->insert($_process_data);
 
-                /*
                 // 会签人数据
                 if ($post['next_user_sign']) {
 
@@ -280,7 +279,7 @@ class Workflow extends BaseModel
                         $_process_data['next_user_id'] = $user_id;
                         DB::table('work_process_data')->insert($_process_data);
                     }
-                }*/
+                }
                 
             break;
 
@@ -313,7 +312,7 @@ class Workflow extends BaseModel
         ]);
 
         // 保存会签意见
-        // $feedback = Workflow::saveFeedback($post);
+        $feedback = Workflow::saveFeedback($post);
 
         // 组合保存表单数据
         $data = Workflow::saveForm($post);
@@ -339,7 +338,7 @@ class Workflow extends BaseModel
             ];
             // 保存会签附件
             if ($feedback['attachment']) {
-                //$data['attachment'] = attachment_store('work_attachment', $feedback['attachment']);
+                $data['attachment'] = attachment_store('work_attachment', $feedback['attachment']);
             }
             DB::table('work_process_feedback')->insert($data);
         }
@@ -369,7 +368,7 @@ class Workflow extends BaseModel
 
             if ($value['class'] == 'listview') {
                 $_data = (array)json_decode($old[$key], true);
-                if (count($post[$key])) {
+                if (count((array)$post[$key])) {
                     // 组合列表数据
                     foreach ($post[$key] as $i => $row) {
                         foreach ($row as $j => $col) {

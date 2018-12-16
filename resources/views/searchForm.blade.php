@@ -9,14 +9,14 @@
                     <div class="form-inline">
                         <div class="form-group">
                             {{$column[2]}}
-                            <input type="hidden" name="field_{{$i}}" id="search-field-{{$i}}" data-type="{{$column[0]}}" value="{{$column[1]}}">
+                            <input type="hidden" name="field_{{$i}}" id="advanced-search-field-{{$i}}" data-type="{{$column[0]}}" value="{{$column[1]}}">
                         </div>
 
                         <div class="form-group" style="display:none;">
-                            <select name="condition_{{$i}}" id="search-condition-{{$i}}" class="form-control input-sm"></select>
+                            <select name="condition_{{$i}}" id="advanced-search-condition-{{$i}}" class="form-control input-sm"></select>
                         </div>
 
-                        <div class="form-group" id="search-value-{{$i}}">
+                        <div class="form-group" id="advanced-search-value-{{$i}}">
                         </div>
                     </div>
                 </div>

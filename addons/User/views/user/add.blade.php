@@ -8,51 +8,51 @@
     <tr>
         <td width="10%" align="right">姓名</td>
         <td width="40%" align="left">
-            <input type="text" id="nickname" name="nickname" class="form-control input-inline input-sm" value="{{$row['nickname']}}">
+            <input type="text" id="nickname" name="nickname" class="form-control input-sm" value="{{$row['nickname']}}">
         </td>
 
         <td width="10%" align="right">生日</td>
         <td width="40%" align="left">
-            <input type="text" id="birthday" name="birthday" value="{{$row->birthday}}" data-toggle="date" class="form-control input-inline input-sm">
+            <input type="text" id="birthday" name="birthday" value="{{$row->birthday}}" data-toggle="date" class="form-control input-sm">
         </td>
     </tr>
     <tr>
         <td align="right">用户名</td>
         <td align="left">
-            <input type="text" id="username" name="username" value="{{$row->username}}" class="form-control input-inline input-sm">
+            <input type="text" id="username" name="username" value="{{$row->username}}" class="form-control input-sm">
         </td>
 
         <td align="right">密码</td>
         <td align="left">
-            <input type="text" id="password" name="password" placeholder="不修改密码请留空。" class="form-control input-inline input-sm">
+            <input type="text" id="password" name="password" placeholder="不修改密码请留空。" class="form-control input-sm">
         </td>
     </tr>
     <tr>
         <td align="right">手机</td>
         <td align="left">
-            <input type="text" id="mobile" name="mobile" value="{{$row->mobile}}" class="form-control input-inline input-sm">
+            <input type="text" id="mobile" name="mobile" value="{{$row->mobile}}" class="form-control input-sm">
         </td>
 
         <td align="right">工作电话</td>
         <td align="left">
-            <input type="text" id="tel" name="tel" value="{{$row->tel}}" class="form-control input-inline input-sm">
+            <input type="text" id="tel" name="tel" value="{{$row->tel}}" class="form-control input-sm">
         </td>
     </tr>
     <tr>
         <td align="right">邮箱</td>
         <td align="left">
-            <input type="text" id="email" name="email" value="{{$row->email}}" class="form-control input-inline input-sm">
+            <input type="text" id="email" name="email" value="{{$row->email}}" class="form-control input-sm">
         </td>
 
         <td align="right">微信</td>
         <td align="left">
-            <input type="text" id="weixin" name="weixin" value="{{$row->weixin}}" class="form-control input-inline input-sm">
+            <input type="text" id="weixin" name="weixin" value="{{$row->weixin}}" class="form-control input-sm">
         </td>
     </tr>
     <tr>
         <td align="right">职位</td>
         <td align="left">
-            <select class="form-control input-inline input-sm" name="post" id="post">
+            <select class="form-control input-sm" name="post" id="post">
                 <option value=""> - </option>
                 @if($positions)
                 @foreach($positions as $position)
@@ -63,7 +63,7 @@
         </td>
         <td align="right">性别</td>
         <td align="left">
-            <select class="form-control input-inline input-sm" name="gender" id="gender">
+            <select class="form-control input-sm" name="gender" id="gender">
                 @foreach(option('user.gender') as $gender)
                     <option value="{{$gender['id']}}" @if($row->gender == $gender['id']) selected @endif>{{$gender['name']}}</option>
                 @endforeach
@@ -91,7 +91,7 @@
     <tr>
         <td align="right">账号状态</td>
         <td align="left">
-            <select class="form-control input-inline input-sm" name="status" id="status">
+            <select class="form-control input-sm" name="status" id="status">
                 <option value="1" @if($row->status == '1') selected @endif>启用</option>
                 <option value="0" @if($row->status == '0') selected @endif>停用</option>
             </select>
@@ -143,16 +143,15 @@
 </form>
 
 <script type="text/javascript">
-
 $('#myform').submit(function() {
     var url  = $(this).attr('action');
     var data = $(this).serialize();
     $.post(url, data, function(res) {
         if(res.status) {
-            $.toastr('success', res.data, '提醒');
+            $.toastr('success', res.data);
             window.location.href = res.url;
         } else {
-            $.toastr('error', res.data, '错误');
+            $.toastr('error', res.data);
         }
     }, 'json');
     return false;

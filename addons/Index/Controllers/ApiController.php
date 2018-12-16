@@ -6,6 +6,8 @@ use Input;
 use QRCode;
 use Request;
 
+use Pinyin;
+
 use Aike\User\User;
 
 class ApiController extends Controller

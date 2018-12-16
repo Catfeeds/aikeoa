@@ -69,9 +69,8 @@
     <td align="right"></td>
     <td>
         <input type="hidden" name="id" value="{{$row['id']}}">
-        <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> 提交</button>
         <button type="button" onclick="history.back();" class="btn btn-default">返回</button>
-        
+        <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> 提交</button>
     </td>
 </tr>
 
@@ -80,3 +79,18 @@
 </form>
 
 </div>
+<script type="text/javascript">
+    $('#myform').submit(function() {
+        var url  = $(this).attr('action');
+        var data = $(this).serialize();
+        $.post(url, data, function(res) {
+            if(res.status) {
+                $.toastr('success', res.data);
+                window.location.href = res.url;
+            } else {
+                $.toastr('error', res.data);
+            }
+        }, 'json');
+        return false;
+    });
+</script>

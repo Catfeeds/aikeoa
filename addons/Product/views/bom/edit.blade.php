@@ -106,7 +106,7 @@ function saveData() {
     var product_id = $('#product_id').val();
 
     if(product_id == '') {
-        $.toastr('error', '产品不能为空。', '错误');
+        $.toastr('error', '产品不能为空。');
         return false;
     }
 
@@ -116,11 +116,11 @@ function saveData() {
 
     if(rows.v === true) {
         if(rows.data.length === 0) {
-            $.toastr('error', '商品列表不能为空。', '错误');
+            $.toastr('error', '商品列表不能为空。');
         } else {
             data['rows'] = rows.data;
             $.post('{{url("store")}}', data, function(res) {
-                $.toastr('success', 'BOM单保存成功。', '提醒');
+                $.toastr('success', 'BOM单保存成功。');
             });
         }
     }

@@ -7,16 +7,14 @@
             <div class="col-sm-6">
                 <div class="wrapper-xs">
                     <div class="form-inline">
-
-                            <div class="form-group">
-                                {{$column[2]}}
-                                <input type="hidden" name="field_{{$i}}" id="search-field-{{$i}}" data-type="{{$column[0]}}" value="{{$column[1]}}">
-                            </div>
-                        
-                            <div class="form-group" style="display:none;">
-                                <select name="condition_{{$i}}" id="search-condition-{{$i}}" class="form-control input-sm"></select>
-                            </div>
-                        <div class="form-group" id="search-value-{{$i}}"></div>
+                        <div class="form-group">
+                            {{$column[2]}}
+                            <input type="hidden" name="field_{{$i}}" id="advanced-search-field-{{$i}}" data-type="{{$column[0]}}" value="{{$column[1]}}">
+                        </div>
+                        <div class="form-group" style="display:none;">
+                            <select name="condition_{{$i}}" id="advanced-search-condition-{{$i}}" class="form-control input-sm"></select>
+                        </div>
+                        <div class="form-group" id="advanced-search-value-{{$i}}"></div>
                     </div>
                 </div>
             </div>
@@ -34,8 +32,7 @@
             </button>
             <ul class="dropdown-menu text-xs" role="menu">
                 <li>
-                    <a href="{{url('')}}">
-                        <i class="fa fa-search"></i> 简单搜索</a>
+                    <a href="{{url('')}}"><i class="fa fa-search"></i> 简单搜索</a>
                 </li>
             </ul>
         </div>
@@ -70,13 +67,15 @@
     </button>
     <ul class="dropdown-menu text-xs" role="menu">
         <li>
-            <a href="{{url('', ['advanced' => 1])}}">
-                <i class="fa fa-search"></i> 高级搜索</a>
+            <a href="{{url('', ['advanced' => 1])}}"><i class="fa fa-search"></i> 高级搜索</a>
         </li>
     </ul>
     @endif
 </div>
 </div>
 
-@endif @if($search['params']) @foreach($search['params'] as $key => $param)
-<input name="{{$key}}" type="hidden" value="{{$param}}"> @endforeach @endif
+@endif @if($search['params']) 
+@foreach($search['params'] as $key => $param)
+    <input name="{{$key}}" type="hidden" value="{{$param}}">
+@endforeach 
+@endif

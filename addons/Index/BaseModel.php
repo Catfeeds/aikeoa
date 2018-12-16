@@ -92,9 +92,9 @@ class BaseModel extends Eloquent
     /**
      * 查询 Dialog 字段显示的值，其他模型可复写此方法
      */
-    public function scopeDialog($query, $value, $column)
+    public function scopeDialog($query, $value)
     {
-        return $query->whereIn('id', $value)->get(['id', $column]);
+        return $query->whereIn('id', $value)->get();
     }
 
     /**

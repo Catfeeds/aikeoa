@@ -20,4 +20,11 @@ class Customer extends BaseModel
     {
         return $this->hasMany(\Aike\Customer\Contact::class);
     }
+
+    public function scopeDialog($q, $value)
+    {
+        return $q->leftJoin('user', 'user.id', '=', 'customer.user_id')
+        ->whereIn('customer.id', $value)
+        ->pluck('user.nickname', 'customer.id');
+    }
 }

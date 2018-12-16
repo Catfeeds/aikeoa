@@ -6,14 +6,14 @@ use Input;
 use Request;
 
 use Aike\User\User;
-use Aike\User\Role;
+use Aike\User\Department;
 use Aike\Article\Article;
 use Aike\Index\Attachment;
 use Aike\Index\Controllers\DefaultController;
 
 class ArticleController extends DefaultController
 {
-    public $permission = ['detail'];
+    public $permission = [];
 
     public function indexAction()
     {
@@ -162,8 +162,6 @@ class ArticleController extends DefaultController
         
         $res->attachment = $attach['main'];
 
-        //preg_replace('/(<img).+(src=\"?.+)images\/(.+\.(jpg|gif|bmp|bnp|png)\"?).+>/i',"\${1}\${2}uc/images/\${3}>", $str);
-
         // 已读记录
         $reads = DB::table('article_reader')->where('article_id', $id)->get();
         $reads = array_by($reads, 'created_by');
@@ -207,18 +205,17 @@ class ArticleController extends DefaultController
         if ($scopes->count()) {
             $rows = [];
 
-            $roles = Role::orderBy('lft', 'asc')->pluck('title', 'id');
+            $departments = Department::orderBy('lft', 'asc')->pluck('title', 'id');
 
             foreach ($scopes as $scope) {
                 $read = isset($reads[$scope['id']]) ? 1 : 0;
-
                 $rows['total'][$read]++;
                 $rows['data'][] = [
-                    'read'       => $read,
-                    'role_id'    => $scope['role_id'],
-                    'role'       => $roles[$scope['role_id']],
-                    'nickname'   => $scope['nickname'],
-                    'created_at' => $reads[$scope['id']]['created_at'],
+                    'read'            => $read,
+                    'department_id'   => $scope['department_id'],
+                    'department_name' => $departments[$scope['department_id']],
+                    'nickname'        => $scope['nickname'],
+                    'created_at'      => $reads[$scope['id']]['created_at'],
                 ];
             }
 

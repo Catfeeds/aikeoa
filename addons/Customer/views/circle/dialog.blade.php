@@ -1,11 +1,9 @@
-<div class="padder">
-
+<div class="wrapper" style="padding-top:0;">
     <div class="m-t-sm m-b-sm">
         <form id="dialog-circle-search-form" name="mysearch" class="form-inline" method="get">
             @include('searchForm')
         </form>
     </div>
-
     <table id="customer-circle-dialog">
         <thead>
         <tr>
@@ -96,6 +94,10 @@
                    }
                 }
             });
+        },
+        onDblClickRow: function(row) {
+            setRow(row);
+            $('#modal-dialog-user').dialog('close');
         },
         onCheck: function(row) {
             setRow(row);

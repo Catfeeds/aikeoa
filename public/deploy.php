@@ -3,11 +3,11 @@
 error_reporting(1);
 
 // 建立镜像仓库
-// sudo -Hu www git clone --mirror git@git.sc35.com:hawind/hengxing-web.git
-// sudo -Hu www git remote update && sudo -Hu www git --work-tree=/www/htdocs/hengxing.aikeoa.com checkout master -f 
+// sudo -Hu www git clone --mirror git@git.sc35.com:hawind/aikeoa-web.git
+// sudo -Hu www git remote update && sudo -Hu www git --work-tree=/www/htdocs/demo.aikeoa.com checkout master -f
 
-$git = '/www/git/deploy/hengxing-web.git';
-$web = '/www/htdocs/hengxing.aikeoa.com';
+$git = '/www/git/deploy/aikeoa-web.git';
+$web = '/www/htdocs/demo.aikeoa.com';
  
 $token    = '1GpLHbLvtDuTPkWd';
 $wwwUser  = 'www';

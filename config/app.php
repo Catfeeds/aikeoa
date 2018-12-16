@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'shenghua'),
+    'name' => env('APP_NAME', 'aikeoa'),
 
     /*
     |--------------------------------------------------------------------------
@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => env('APP_DEBUG', true),
+    'debug' => env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -104,7 +104,7 @@ return [
     |
     */
 
-    'key' => env('APP_KEY', 'EEP27jkqQaiD43h0tUVxFlgXXQb7ylDx'),
+    'key' => env('APP_KEY'),
 
     'cipher' => 'AES-256-CBC',
 

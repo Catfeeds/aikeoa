@@ -50,8 +50,8 @@ class WorkflowController extends DefaultController
             ['category','w.category_id','工作类别'],
             ['text','wp.id','工作流程号(ID)'],
             ['department','user.department_id','发起人部门'],
-            //['text','wp.name','工作文号'],
-            //['text','wp.work_id','流程编号'],
+            ['text','wp.name','工作文号'],
+            ['text','wp.work_id','流程编号'],
             ['text','user.nickname','工作发起人'],
             ['text','handle_user','当前主办人'],
             
@@ -619,10 +619,12 @@ class WorkflowController extends DefaultController
 
             // 写入运行实例第一步
             DB::table('work_process_data')->insert([
-                'process_id' => $process_id,
-                'step_id'    => $step['id'],
-                'user_id'    => Auth::id(),
-                'number'     => 1,
+                'process_id'  => $process_id,
+                'step_id'     => $step['id'],
+                'user_id'     => Auth::id(),
+                'number'      => 1,
+                'add_user_id' => Auth::id(),
+                'add_time'    => time(),
             ]);
 
             // 处理工作表建立和更新

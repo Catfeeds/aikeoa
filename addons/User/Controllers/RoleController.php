@@ -5,88 +5,93 @@ use Auth;
 use Input;
 use Request;
 use Validator;
-use App\License;
-
 use Module;
+use Collection;
 
 use Aike\User\User;
 use Aike\User\Role;
 use Aike\User\UserAsset;
+use Aike\Model\Grid;
+use Aike\Model\Form;
+use App\License;
 
 use Aike\Index\Controllers\DefaultController;
 
 class RoleController extends DefaultController
 {
-    public $permission = ['index', 'dialog'];
+    public $permission = ['dialog'];
 
     public function indexAction()
     {
-        $metaData = [
-            'columns' => [[
-                    'dataIndex' => 'text',
-                    'xtype'     => 'treecolumn',
-                    'flex'      => 1,
-                    'minWidth'  => 200,
-                    'sortable'  => true,
-                    'text'      => '名称',
-                    'search'    => [
-                        'name'  => 'title',
-                        'xtype' => 'textfield',
-                    ],
-                ],[
-                    'dataIndex' => 'name',
-                    'width'     => 200,
-                    'text'      => '标签',
-                ],[
-                    'dataIndex' => 'description',
-                    'width'     => 200,
-                    'text'      => '描述',
-                ],[
-                    'dataIndex' => 'count',
-                    'text'      => '用户数',
-                    'align'     => 'center',
-                ],[
-                    'dataIndex' => 'id',
-                    'text'      => '编号',
-                    'align'     => 'center',
-                    'width'     => 70,
-                ]
-            ]
+        $haeder = Grid::haeder([
+            'table'   => 'role',
+            'referer' => 1,
+            'search'  => ['by' => ''],
+        ]);
+
+        $cols = $haeder['cols'];
+        $cols = Grid::addCols($cols, 'name', [
+            'label' => '用户数',
+            'name'  => 'user_count',
+            'align' => 'center',
+        ]);
+        /*
+        $cols['checkbox'] = [
+            'name'      => 'batch',
+            'index'     => 'batch',
+            'sortable'  => false,
+            'label'     => '<input role="checkbox" data-action="checkboxAll" data-toggle="event" class="cbox" type="checkbox">', 
+            'formatter' => 'checkbox', 
+            'width'     => 60, 
+            'align'     => 'center'
         ];
+        */
+        $cols['actionLink']['options'] = [[
+            'name'    => '编辑',
+            'action'  => 'edit',
+            'display' => $this->access['edit'],
+        ],[
+            'name'    => '权限',
+            'action'  => 'config',
+            'display' => $this->access['config'],
+        ]];
+
+        $search = $haeder['search_form'];
+        $query = $search['query'];
 
         if (Request::method() == 'POST') {
-            $sorts = Input::get('sort');
-
-            foreach ($sorts as $id => $sort) {
-                $role = Role::find($id);
-                $role->sort = $sort;
-                $role->save();
+            $model = Role::setBy($haeder);
+            foreach ($haeder['join'] as $join) {
+                $model->leftJoin($join[0], $join[1], $join[2], $join[3]);
             }
-            Role::treeRebuild();
+            $model->leftJoin('user', 'user.role_id', '=', 'role.id');
+            $model->orderBy('role.lft', 'asc');
 
-            return $this->back('恭喜你，操作成功。');
+            foreach ($search['where'] as $where) {
+                if ($where['active']) {
+                    $model->search($where);
+                }
+            }
+
+            $model->select($haeder['select'])
+            ->addSelect(DB::raw('role.parent_id,count(user.id) as user_count'))
+            ->groupBy('role.id');
+
+            $items = $model->get()->toNested();
+            $items = Grid::dataFilter($items, $haeder);
+            return $items->toJson();
         }
-        $modules = Module::allWithDetails();
 
-        $modules = array_sort($modules, function ($value) {
-            return $value['order'];
-        });
-
-        $search = search_form([
-            'referer' => 1,
-        ], []);
-
-        $count = User::groupBy('role_id')->get(array(DB::raw('count(id) AS count'), 'role_id'))->pluck('count', 'role_id');
-        
-        $rows = Role::orderBy('lft', 'asc')->get()->toArray();
-        foreach ($rows as $key => $row) {
-            $rows[$key]['count'] = $count[$row['id']];
-        }
-        $rows = array_nest($rows);
+        $haeder['buttons'] = [
+            ['name' => '删除', 'icon' => 'fa-remove', 'action' => 'delete', 'display' => $this->access['delete']],
+        ];
+        $haeder['cols'] = $cols;
+        $haeder['tabs'] = User::$tabs;
+        $haeder['bys']  = Role::$bys;
+        $haeder['js']   = Grid::js($haeder);
 
         return $this->display([
-            'rows'  => $rows,
-            'count' => $count,
+            'haeder' => $haeder,
         ]);
     }
 
@@ -133,7 +138,6 @@ class RoleController extends DefaultController
                     DB::table('user_asset')->where('id', $_asset['id'])->update($data);
                 }
             }
-            //return $this->back('恭喜您，操作成功。');
             return $this->success('config', $query, '恭喜您，操作成功。', 0);
         }
 
@@ -160,69 +164,69 @@ class RoleController extends DefaultController
         ));
     }
 
-    // 角色编辑
-    public function addAction()
-    {
-        $gets = Input::get();
-
-        $count   = Role::count('id');
-        $license = License::check('role', $count);
-
-        if ($gets['id'] == 0 && $license) {
-            return $this->error('无法新建角色授权许可不足。');
-        }
-        
-        $row = Role::findOrNew($gets['id']);
-
-        if (Request::method() == 'POST') {
-            $rules = array(
-                'name' => 'required',
-                'title' => 'required'
-            );
-            $v = Validator::make($gets, $rules);
-            if ($v->fails()) {
-                return $this->back()->withErrors($v)->withInput();
-            }
-            $row->fill($gets)->save();
-
-            // 重构树形结构
-            Role::treeRebuild();
-
-            return $this->success('index', '恭喜你，操作成功。');
-        }
-        
-        $roles = Role::orderBy('lft', 'asc')->get()->toNested();
-        return $this->display([
-            'row'   => $row,
-            'roles' => $roles,
-        ]);
-    }
-
-    public function dialogAction()
+    public function createAction()
     {
         if (Request::method() == 'POST') {
             $gets = Input::get();
 
-            $model = DB::table('role')
-            ->orderBy('lft', 'asc');
-
-            $rows = $model->get(['id', 'parent_id', 'title']);
-
-            $rows = array_nest($rows, 'title');
-
-            foreach ($rows as $row) {
-                $json[] = [
-                    'id'    => $row['id'],
-                    'sid'   => 'r'.$row['id'],
-                    'title' => $row['title'],
-                    'text'  => $row['layer_space'].$row['title'],
-                ];
+            $rules = Form::rules([
+                'table' => 'role',
+            ]);
+            $v = Validator::make($gets, $rules['rules'], $rules['messages'], $rules['attributes']);
+            if ($v->fails()) {
+                return $this->json($v->errors()->all());
             }
-            return response()->json($json);
+            $_role = $gets['role'];
+            $role = Role::findOrNew($_role['id']);
+
+            $_role['parent_id'] = (int)$_role['parent_id'];
+            $role->fill($_role)->save();
+
+            // 重构树形结构
+            Role::treeRebuild();
+
+            return $this->json('恭喜您，操作成功。', url_referer('index'));
         }
 
+        $id = (int)Input::get('id');
+        $role = Role::find($id);
+
+        $options = [
+            'table' => 'role',
+        ];
+        if ($role->id) {
+            $options['row'] = $role;
+        }
+        $tpl = Form::make($options);
         return $this->render([
-            'rows' => $rows,
+            'tpl' => $tpl,
+        ], 'create');
+    }
+
+    public function editAction()
+    {
+        return $this->createAction();
+    }
+
+    public function dialogAction()
+    {
+        $search = search_form([], [
+            ['text','role.title','名称'],
+            ['text','role.id','ID'],
+        ]);
+        $query = $search['query'];
+
+        if (Request::method() == 'POST') {
+            $rows = Role::orderBy('lft', 'asc')->get()->toNested();
+            $data = [];
+            foreach ($rows as $row) {
+                $row['sid']  = 'r'.$row['id'];
+                $row['text'] = $row['layer_space'].$row['title'];
+                $data[] = $row;
+            }
+            return response()->json(['data' => $data]);
+        }
+        return $this->render([
             'get'  => Input::get(),
         ]);
     }
@@ -231,16 +235,17 @@ class RoleController extends DefaultController
     public function deleteAction()
     {
         if (Request::method() == 'POST') {
+
             $id = Input::get('id');
             $id = array_filter((array)$id);
 
             if (empty($id)) {
-                return $this->error('最少选择一行记录。');
+                return $this->json('最少选择一行记录。');
             }
 
             $has = Role::whereIn('parent_id', $id)->count();
             if ($has) {
-                return $this->error('存在子节点不允许删除。');
+                return $this->json('存在子节点不允许删除。');
             }
 
             // 删除角色
@@ -249,7 +254,7 @@ class RoleController extends DefaultController
             // 重构树形结构
             Role::treeRebuild();
 
-            return $this->back('删除成功。');
+            return $this->json('删除成功。', true);
         }
     }
 }

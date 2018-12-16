@@ -3,7 +3,7 @@
 /**
  * 公共文件目录
  */
-function public_path($path = '')
+function public_path($path = null)
 {
     return base_path('public').($path ? '/'.$path : $path);
 }
@@ -11,7 +11,7 @@ function public_path($path = '')
 /**
  * 文件上传目录
  */
-function upload_path($path = '')
+function upload_path($path = null)
 {
     return public_path('uploads').($path ? '/'.$path : $path);
 }

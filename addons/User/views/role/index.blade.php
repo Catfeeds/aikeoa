@@ -1,67 +1,88 @@
-<div class="panel">
-
-    <div class="wrapper">
-
-        <div class="pull-right">
-            <a class="btn btn-sm btn-default" href="javascript:optionSort('#myform','{{url('index')}}');"><i class="icon icon-sort-by-order"></i> 排序</a>
-            @if(isset($access['delete']))
-                <a class="btn btn-sm btn-danger" href="javascript:optionDelete('#myform','{{url('delete')}}');"><i class="icon icon-remove"></i> 删除</a>
-            @endif
-        </div>
-
-        @if(isset($access['add']))
-            <a href="{{url('add')}}" class="btn btn-sm btn-info"><i class="icon icon-plus"></i> 新建</a>
-        @endif
-
+{{$haeder["js"]}}
+<div class="panel b-a" id="{{$haeder['table']}}-controller">
+    @include('tabs2') 
+    @include('haeders')
+    <div class="list-jqgrid aike-jqgrid-tree">
+        <table id="{{$haeder['table']}}-grid"></table>
     </div>
-
-    <form method="post" id="myform" name="myform">
-    <div class="table-responsive">
-    <table class="table m-b-none b-t table-hover">
-        <thead>
-            <tr>
-                <th>
-                    <input class="select-all" type="checkbox">
-                </th>
-                <th align="left">名称</th>
-                <th align="left">代码</th>
-                <th align="center">用户数</th>
-                <th align="center">排序</th>
-                <th align="center">ID</th>
-                <th align="center"></th>
-            </tr>
-        </thead>
-        @if($rows)
-        @foreach($rows as $row)
-        <tr>
-            <td align="center">
-                <input class="select-row" type="checkbox" name="id[]" value="{{$row['id']}}"@if($row['system'] == 1) disabled @endif>
-            </td>
-            <td align="left">
-
-                {{str_repeat('<span class="level"></span>', $row['layer_level'])}}
-                @if(sizeof($row['child']) == 1)
-                    <i class="fa fa-file-o"></i>
-                @else
-                    <i class="fa fa-folder-o"></i>
-                @endif
-                {{$row['title']}}
-
-            </td>
-            <td align="left">{{$row['name']}}</td>
-            <td align="center"><span class="badge badge-primary">{{(int)$count[$row['id']]}}</span></td>
-            <td align="center">
-                <input type="text" name="sort[{{$row['id']}}]" class="form-control input-sort" value="{{$row['sort']}}">
-            </td>
-            <td align="center">{{$row['id']}}</td>
-            <td align="center">
-                <a class="option" href="{{url('config',['role_id'=>$row['id']])}}">权限</a> 
-                <a class="option" href="{{url('add',['id'=>$row['id']])}}">编辑</a>
-            </td>
-        </tr>
-        @endforeach
-        @endif
-    </table>
-    </div>
-    </form>
 </div>
+<script>
+(function($) {
+
+    $.extend($.fn.fmatter, {
+        customer: function(cellvalue, options, rowdata) {
+            return "<a data-toggle='event' data-action='show' data-id='"+rowdata.id+"' class='option'><i class='icon icon-user'></i> "+ cellvalue +"</a>";
+        }
+    });
+    
+    var table = '{{$haeder["table"]}}';
+    var config = window[table];
+    var action = config.action;
+    var search = config.search;
+
+    action.config = function(data) {
+        var me = this;
+        var url = app.url('user/role/config', {role_id: data.id});
+        var index = layer.open({
+            title: '<i class="fa fa-columns"></i> ' + me.name +'</a>',
+            type: 2,
+            move: false,
+            content: url,
+        });
+        layer.full(index);
+    }
+
+    // 自定义搜索方法
+    search.searchInit = function(e) {
+        var self = this;
+    }
+    config.grid = $('#' + table + '-grid').jqGrid({
+        caption: '',
+        datatype: 'json',
+        mtype: 'POST',
+        url: '{{url()}}',
+        colModel: config.cols,
+        rowNum: 25,
+        autowidth: true,
+        multiselect: true,
+        viewrecords: true,
+        rownumbers: false,
+        width: '100%',
+        height: getPanelHeight(),
+        footerrow: false,
+        postData: search.advanced.query,
+        ExpandColumn : 'text',
+        ExpandColClick: true,
+        treeGrid: true,
+        treedatatype:"json",
+        treeGridModel:"adjacency",
+        treeReader: {
+            parent_id_field:"parent_id",
+            level_field:"layer_level",
+            leaf_field:"isLeaf",
+            expanded_field:"expanded",
+            loaded:"loaded"
+        },
+        ondblClickRow: function(rowIndex) {
+            var row = $(this).getRowData(rowIndex);
+            action.edit(row);
+        },
+        gridComplete: function() {
+            $(this).jqGrid('setColsWidth');
+        }
+    }).on('click', '[data-toggle="event"]', function() {
+        var data = $(this).data();
+        action[data.action](data);
+    });
+
+    function getPanelHeight() {
+        var list = $('.list-jqgrid').position();
+        return top.iframeHeight - list.top - 48;
+    }
+    $(window).on('resize', function() {
+        config.grid.jqGrid('setGridHeight', getPanelHeight());
+    });
+})(jQuery);
+
+</script>
+@include('footers')

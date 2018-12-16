@@ -25,6 +25,28 @@ class User extends BaseModel implements
 
     protected $table = 'user';
 
+    static public $tabs = [
+        'name'  => 'tab',
+        'items' => [
+            ['value' => 'user.index', 'url' => 'user/user/index', 'name' => '用户列表'],
+            ['value' => 'role.index', 'url' => 'user/role/index', 'name' => '角色列表'],
+            ['value' => 'department.index', 'url' => 'user/department/index', 'name' => '部门列表'],
+            ['value' => 'group.index', 'url' => 'user/group/index', 'name' => '用户组列表'],
+            ['value' => 'position.index', 'url' => 'user/position/index', 'name' => '职位列表'],
+        ]
+    ];
+
+    static public $bys = [
+        'name'  => 'by',
+        'items' => [
+            ['value' => '', 'name' => '全部'],
+            ['value' => 'divider'],
+            ['value' => 'day', 'name' => '今日创建'],
+            ['value' => 'week', 'name' => '本周创建'],
+            ['value' => 'month', 'name' => '本月创建'],
+        ]
+    ];
+
     /**
      * The attributes excluded from the model's JSON form.
      *
@@ -201,6 +223,12 @@ class User extends BaseModel implements
             if ($scope['u']) {
                 $q->orwhereIn('id', $scope['u']);
             }
-        })->get(['id', 'role_id', 'username', 'nickname', 'email', 'mobile']);
+        })->get(['id', 'role_id', 'department_id', 'username', 'nickname', 'email', 'mobile']);
+    }
+
+    public function scopeDialog($q, $value)
+    {
+        return $q->whereIn('id', $value)
+        ->pluck('nickname', 'id');
     }
 }

@@ -46,7 +46,7 @@ var select2List = {};
                 if(m.remark == undefined) {
                     return m.text;
                 }
-                return m.name;
+                return m.title;
             }
         };
 

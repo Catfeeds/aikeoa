@@ -67,8 +67,8 @@
     </div>
     <div class="panel-footer">
         <div class="col-sm-offset-2">
-            <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> 提交</button>
             <button type="button" onclick="history.back();" class="btn btn-default">返回</button>
+            <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> 提交</button>
         </div>
     </div>
 </div>

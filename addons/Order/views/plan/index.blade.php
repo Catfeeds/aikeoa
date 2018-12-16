@@ -177,7 +177,7 @@ $(function() {
         },
         afterSubmitCell: function(res, rowid, cellname, value, iRow, iCol) {
             if(res.status == 200) {
-                $.toastr('success', '生产计划时间修改成功。', '提醒');
+                $.toastr('success', '生产计划时间修改成功。');
             }
             return [true];
         },

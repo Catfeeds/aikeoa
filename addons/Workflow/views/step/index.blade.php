@@ -31,12 +31,12 @@ stepIsRepeat = function(param){
 var beforeDropHandler = function(param) {
 
     if(isConnectToSelf(param)) {
-        $.toastr('error','连接点不能是自己。','流程设计');
+        $.toastr('error','连接点不能是自己。');
         return false;
     }
     // 连接步骤是否重复
     if(stepIsRepeat(param)) {
-        $.toastr('error','连接点已经存在。','流程设计');
+        $.toastr('error','连接点已经存在。');
         return false;
     }
     // 连接步骤是结束
@@ -267,7 +267,7 @@ var workStep = {
             {
                 if(data.status) {
                     workStep.init();
-                    $.toastr('success','操作成功','流程设计');
+                    $.toastr('success','操作成功');
                 }
             },'json');
         });
@@ -278,7 +278,7 @@ var workStep = {
             $.post('{{url("add")}}',{id:nowStepId,work_id:'{{$work_id}}'},function(data) {
                 if(data.status) {
                     workStep.init();
-                    $.toastr('success','操作成功','流程设计');
+                    $.toastr('success','操作成功');
                 }
             },'json');
         });
@@ -314,7 +314,7 @@ var workStep = {
         $.post('{{url("add")}}',{work_id:'{{$work_id}}'},function(data) {
             if(data.status) {
                 workStep.init();
-                $.toastr('success','操作成功','流程设计');
+                $.toastr('success','操作成功');
             }
         },'json');
     },
@@ -323,7 +323,7 @@ var workStep = {
         var rows = jsPlumb.getConnections();
 
         if(rows.length == 0) {
-            $.toastr('error','请先建立连接','流程设计');
+            $.toastr('error','请先建立连接');
             return;
         }
 
@@ -344,7 +344,7 @@ var workStep = {
 
         $.post('{{url("save")}}',{join:join,position:position,work_id:'{{$work_id}}'},function(result) {
             if(result.status) {
-                $.toastr('success','保存当前视图成功','流程设计');
+                $.toastr('success','保存当前视图成功。');
             }
         },'json');
     }

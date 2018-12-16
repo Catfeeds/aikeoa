@@ -15,4 +15,10 @@ class Circle extends BaseModel
     {
         return $this->belongsTo('Aike\Customer\Circle');
     }
+
+    public function scopeDialog($q, $value)
+    {
+        return $q->whereIn('id', $value)
+        ->pluck('name', 'id');
+    }
 }

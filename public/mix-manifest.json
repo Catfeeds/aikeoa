@@ -1,7 +1,7 @@
 {
-    "/assets/dist/bundle.min.js": "/assets/dist/bundle.min.js?id=ea350aa889d03fd3c45b",
-    "/assets/dist/app.min.js": "/assets/dist/app.min.js?id=f27883c07f0e8a50f30a",
-    "/assets/dist/app.min.css": "/assets/dist/app.min.css?id=64772efd07c84f0bf015",
-    "/assets/dist/index.min.js": "/assets/dist/index.min.js?id=1a614b7ebbefc5e5b8df",
-    "/assets/dist/index.min.css": "/assets/dist/index.min.css?id=0c05b114ade2cc229485"
+    "/assets/dist/bundle.min.js": "/assets/dist/bundle.min.js",
+    "/assets/dist/app.min.js": "/assets/dist/app.min.js",
+    "/assets/dist/app.min.css": "/assets/dist/app.min.css",
+    "/assets/dist/index.min.js": "/assets/dist/index.min.js",
+    "/assets/dist/index.min.css": "/assets/dist/index.min.css"
 }

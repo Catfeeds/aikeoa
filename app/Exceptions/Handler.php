@@ -46,6 +46,17 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof CustomException) {
+            $result = [
+                'data'   => $exception->getMessage(),
+                'status' => false,
+            ];
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json($result);
+            } else {
+                return response()->view('errors.custom', $result);
+            }
+        }
         return parent::render($request, $exception);
     }
 }

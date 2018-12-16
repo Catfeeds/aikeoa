@@ -21,7 +21,9 @@ class Grid
 {
     public static function dataFilter($items, $haeder, $callback = null)
     {
-        $items->transform(function ($item) use ($haeder, $callback) {
+        $dialogs = [];
+
+        $items->transform(function ($item) use ($haeder, $callback, &$dialogs) {
 
             if (is_callable($callback)) {
                 $item = $callback($item);
@@ -29,19 +31,31 @@ class Grid
 
             foreach ($haeder['columns'] as $column) {
 
+                $field   = $column['field'];
                 $setting = $column['setting'];
-                $value = $item[$column['field']];
+                $type    = $setting['type'];
+                $value   = $item[$field];
 
                 if ($column['form_type'] == 'address') {
                     $value = str_replace("\n", ' ', $value);
                 }
+
+                if ($column['form_type'] == 'dialog' || $column['form_type'] == 'select2') {
+                    $_field = str_replace('_'.$type, '', $field);
+                    $value = $item[$_field];
+                    $v = $dialogs[$field]['value'];
+                    $v = empty($v) ? $value : $v.','.$value;
+                    $dialogs[$field] = ['type' => $type, 'value' => $v];
+                }
+
                 if ($column['form_type'] == 'date') {
                     if ($setting['save'] == 'u') {
-                        $value = date($setting['type'], $value);
+                        $value = date($type, $value);
                     }
                 }
+
                 if ($column['form_type'] == 'option') {
-                    $value = option($setting['type'], $value);
+                    $value = option($type, $value);
                 }
 
                 if ($column['form_type'] == 'select') {
@@ -58,7 +72,7 @@ class Grid
                     $value = join(',', $res);
                 }
 
-                if ($column['field'] == 'step_sn') {
+                if ($field == 'step_sn') {
                     $steps = $haeder['steps'];
                     $value = $steps[$value]['name'];
                 }
@@ -66,11 +80,44 @@ class Grid
                 if($column['type'] == 'DECIMAL') {
                     $value = number_format($value, 2);
                 }
-                $item[$column['field']]= $value;
-            }
 
+                $item[$field] = $value;
+            }
             return $item;
         });
+
+        foreach ($dialogs as $field => $dialog) {
+            $option = Module::dialogs($dialog['type']);
+            $ids = explode(',', $dialog['value']);
+            if ($option['model']) {
+                $dialogs[$field]['rows'] = $option['model']($ids);
+            }
+        }
+
+        $index = 0;
+        $rows = [];
+        foreach ($items as $item) {
+            foreach ($dialogs as $field => $dialog) {
+                $item[$field] = $dialog['rows'][$item[$field]];
+            }
+            $rows[$index] = $item;
+            $index++;
+        }
+
+        $rows = collect($rows);
+        if ($items instanceof \Illuminate\Pagination\AbstractPaginator) {
+            $items->setCollection($rows);
+        } else {
+            $items = $rows;
+        }
+        /*
+        $items->transform(function ($item) use ($dialogs, $rows) {
+            foreach ($dialogs as $field => $dialog) {
+                $item[$field] = $dialog['rows'][$item[$field]];
+            }
+            return $item;
+        });
+        */
         return $items;
     }
 
@@ -110,31 +157,29 @@ class Grid
                     $field['field'] = str_replace('_id', '_text', $_field);
                 }
 
-                if ($field['form_type'] == 'dialog' || $field['form_type'] == 'autocomplete') {
-                    $dialog = Module::dialogs($setting['type']);
-                    
-                    $select[] = $table.'.'.$_field;
-                    $join[]   = [$dialog['table'].' as '.$_field.'_'.$dialog['table'], $_field.'_'.$dialog['table'].'.id', '=', $table.'.'.$_field];
-                    $select[] = $_field.'_'.$dialog['field'].' as '.$_field.'_'.$dialog['table'];
-                    $index    = $_field.'_'.$dialog['field'];
-                    $column   = $_field.'_'.$dialog['table'];
-                    
-                } elseif ($field['form_type'] == 'select2') {
+                if ($field['form_type'] == 'autocomplete') {
                     $dialog = Module::dialogs($setting['type']);
                     $select[] = $table.'.'.$_field;
                     $join[]   = [$dialog['table'].' as '.$_field.'_'.$dialog['table'], $_field.'_'.$dialog['table'].'.id', '=', $table.'.'.$_field];
                     $select[] = $_field.'_'.$dialog['field'].' as '.$_field.'_'.$dialog['table'];
                     $index    = $_field.'_'.$dialog['field'];
                     $column   = $_field.'_'.$dialog['table'];
+                    
+                } else if ($field['form_type'] == 'dialog' || $field['form_type'] == 'select2') {
+                    $type = $setting['type'];
+                    $select[] = $table.'.'.$_field;
+                    $index    = $table.'.'.$_field;
+                    $column   = $_field.'_'.$type;
+                    
                 } else {
                     $column = $field['field'];
                     $index    = $table.'.'.$field['field'];
                     $select[] = $table.'.'.$field['field'];
                 }
 
-                $field['field']    = $column;
-                $field['index']    = $index;
-                $field['setting']  = $setting;
+                $field['field']   = $column;
+                $field['index']   = $index;
+                $field['setting'] = $setting;
 
                 $res['columns'][$field['field']] = $field;
 
@@ -155,6 +200,7 @@ class Grid
                 // 搜索字段
                 if ($field['is_search'] == 1) {
                     $form_type = $field['form_type'];
+                    $_options  = [];
 
                     if ($field['form_type'] == 'date') {
                         $form_type = 'date2';
@@ -163,28 +209,55 @@ class Grid
                     if ($field['form_type'] == 'address') {
                         $form_type = 'text';
                     }
-                    if ($field['form_type'] == 'dialog' || $field['form_type'] == 'autocomplete') {
+
+                    if ($field['form_type'] == 'dialog') {
+                        $form_type = 'dialog';
+                        $_options = Module::dialogs($setting['type']);
+                    }
+
+                    if ($field['form_type'] == 'select2') {
+                        $form_type = 'dialog';
+                        $_options = Module::dialogs($setting['type']);
+                    }
+
+                    if ($field['form_type'] == 'autocomplete') {
                         $form_type = 'text';
                     }
+
                     if ($field['form_type'] == 'textarea') {
                         $form_type = 'text';
                     }
+
                     if ($field['form_type'] == 'select') {
                         $form_type = 'text';
                     }
+
                     if ($field['form_type'] == 'option') {
                         $form_type = $setting['type'];
                     }
-                    if ($field['form_type'] == 'auto' || $field['form_type'] == 'sn') {
+
+                    if ($field['form_type'] == 'auto') {
                         $form_type = 'text';
                     }
+
+                    if ($field['form_type'] == 'sn') {
+                        $form_type = 'text';
+                    }
+
+                    if ($field['form_type'] == 'urd') {
+                        $form_type = 'text';
+                    }
+
                     if ($column == 'step_sn') {
                         $form_type = 'model_step.'.$table;
                     }
-                    if ($form_type == 'urd') {
-                        $form_type = 'text';
-                    }
-                    $search[] = [$form_type, $field['index'], $field['name']];
+
+                    $search[] = [
+                        'form_type' => $form_type,
+                        'field'     => $field['index'],
+                        'name'      => $field['name'],
+                        'options'   => $_options,
+                    ];
                 }
             }
         }
@@ -207,7 +280,7 @@ class Grid
             $select[] = $table.'.step_status';
         }
 
-        $search_form = search_form($options['search'], $search, $options['referer']);
+        $search_form = search_form($options['search'], $search, $options['referer'], 'model');
 
         $sort  = Input::get('sort');
         $sort = $sort == '' ? $table.'.id' : $sort;

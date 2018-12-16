@@ -55,10 +55,10 @@ function formsBox(title, url, id, success, remove, error)
 function saveResult(res) {
 	if(res.status) {
 		dataReload();
-		$.toastr('success', res.data, '提醒');
+		$.toastr('success', res.data);
 		$(this).dialog("close");
 	} else {
-		$.toastr('error', res.data, '提醒');
+		$.toastr('error', res.data);
 	}
 }
 
@@ -129,10 +129,10 @@ function addSubTask(id) {
 		if(res.status) {
 			dataReload();
 			$('#task-subtask-' + id).prepend('<p><span class="time">'+ res.data.created_at + '(' + res.data.user_name + ')</span><label class="i-checks i-checks-sm m-b-none"><input class="select-row" type="checkbox" name="progress" value="'+ res.data.progress + '"><i></i></label><a href="javascript:editSubTask(' + res.data.id + ');">'+ res.data.name + '</a></p>');
-			$.toastr('success', '恭喜您，添加子任务成功。', '提醒');
+			$.toastr('success', '恭喜您，添加子任务成功。');
 			$(this).dialog("close");
 		} else {
-			$.toastr('error', res.data, '提醒');
+			$.toastr('error', res.data);
 		}
 	});
 }
@@ -166,10 +166,10 @@ function addComment(task_id) {
 	formsBox('添加评论', app.url('project/comment/add', {task_id:task_id}), 'comment-form', function(res) {
 		if(res.status) {
 			$('#task-log-' + task_id).prepend('<p class="task-log-comment"><span class="time">' + res.data.created_at + '</span><div class="task-log-user">' + res.data.user + '</div>' + res.data.content + '</p>');
-			$.toastr('success', '恭喜您，添加评论成功。', '提醒');
+			$.toastr('success', '恭喜您，添加评论成功。');
 			$(this).dialog("close");
 		} else {
-			$.toastr('error', res.data, '提醒');
+			$.toastr('error', res.data);
 		}
 	});
 }

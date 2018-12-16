@@ -4,6 +4,23 @@ return [
     "order" => 42,
     "version" => "1.0",
     "description" => "潜在客户资料上传，通过手机客户端收集客户资料。",
+    'dialogs' => [
+        'circle' => [
+            'name'  => '销售区域',
+            'model' => 'Aike\Customer\Circle::Dialog',
+            'table' => 'customer_circle',
+            'field' => 'customer_circle.name',
+            'url'   => 'customer/circle/dialog',
+        ],
+        'customer' => [
+            'name'  => '客户',
+            'model' => 'Aike\Customer\Customer::Dialog',
+            'table' => 'customer',
+            'join'  => ['user', 'user.id', 'customer.user_id'],
+            'field' => 'user.nickname',
+            'url'   => 'customer/customer/dialog',
+        ],
+    ],
     "access" => [
         1 => "本人",
         2 => "本人和下属",

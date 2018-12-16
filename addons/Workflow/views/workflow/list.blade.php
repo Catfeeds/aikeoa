@@ -52,7 +52,7 @@ function workStart(id)
                     if (res.status) {
                         window.location.href= '{{url("edit")}}?process_id='+res.data.process_id;
                     } else {
-                        $.toastr('error', res.data, '工作办理');
+                        $.toastr('error', res.data);
                     }
                 },'json');
             }

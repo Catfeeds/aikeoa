@@ -262,7 +262,7 @@ gantt.attachEvent('onBeforeRowDragEnd', function(task_id, parent, index) {
 
     var data = gantt.getSiblings(task_id);
 	$.post('{{url("sort")}}', {id:task_id,parent_id:task.parent,sort:data}, function(res) {
-		$.toastr('success', '恭喜您，任务排序成功。', '提醒');
+		$.toastr('success', '恭喜您，任务排序成功。');
 	}, 'json');
 
 	return true;

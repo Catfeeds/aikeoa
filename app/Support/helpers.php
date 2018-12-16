@@ -70,6 +70,10 @@ function search_condition($query)
             $condition = array('in', explode(',', $search));
             break;
 
+        case 'dialog':
+            $condition = array('dialog', $search);
+            break;
+
         case 'address':
             $condition = array('!=', '');
             break;
@@ -99,7 +103,7 @@ function search_condition($query)
 }
 
 // 组合搜索表单
-function search_form($params = [], $columns = [], $orders = [])
+function search_form($params = [], $columns = [], $orders = [], $type = 'old')
 {
     if ($params['referer']) {
         $uri = join('_', Request::segments());
@@ -146,10 +150,19 @@ function search_form($params = [], $columns = [], $orders = [])
             $where[$i]['active'] = $active;
         }
     } else {
-        foreach ($columns as $i => $column) {
-            $forms['field'][$i]     = $column[1];
-            $forms['condition'][$i] = '';
-            $forms['search'][$i]    = empty($column[3]) ? '' : $column[3];
+        if ($type == 'model') {
+            foreach ($columns as $i => $column) {
+                $forms['field'][$i]     = $column['field'];
+                $forms['condition'][$i] = '';
+                $forms['search'][$i]    = empty($column['value']) ? '' : $column['value'];
+            }
+            
+        } else {
+            foreach ($columns as $i => $column) {
+                $forms['field'][$i]     = $column[1];
+                $forms['condition'][$i] = '';
+                $forms['search'][$i]    = empty($column[3]) ? '' : $column[3];
+            }
         }
     }
 
@@ -956,12 +969,21 @@ function array_nest(&$items, $text = 'name')
         $item['layer_html']  = '';
         $item['layer_space'] = '';
 
+        $item['folder']    = false;
+        $item['isLeaf']    = true;
+        $item['expanded']  = false;
+        $item['loaded']    = true;
+
         $item['text'] = $item[$text];
         $tree[$item['id']] = $item;
     }
 
     foreach ($items as $item) {
         if (isset($tree[$item['parent_id']])) {
+            $tree[$item['parent_id']]['folder'] = true;
+            $tree[$item['parent_id']]['isLeaf'] = false;
+            $tree[$item['parent_id']]['expanded'] = true;
+            
             $tree[$item['id']]['text'] = $tree[$item['parent_id']]['text'].'/'.$tree[$item['id']]['text'];
             
             $tree[$item['id']]['layer_html'] = $tree[$item['parent_id']]['layer_html'].'<span class="layer">|&ndash; </span>';

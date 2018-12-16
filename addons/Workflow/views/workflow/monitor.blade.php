@@ -114,7 +114,7 @@ function correct(id)
                     if (res1.status) {
                         location.href = res1.data;
                     } else {
-                        $.toastr('error', res1.data, '工作办理');
+                        $.toastr('error', res1.data);
                     }
                 },'json');
             }

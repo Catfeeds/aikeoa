@@ -226,13 +226,13 @@ $(function() {
     // 日期选择
     $document.on('click.date', '[data-toggle="date"]', function() {
         var format = $(this).data('format') || 'yyyy-MM-dd';
-        datePicker({dateFmt: format});
+        datePicker({errDealMode:2, dateFmt:format});
     });
 
     // 日期时间选项
     $document.on('click.datetime', '[data-toggle="datetime"]', function() {
         var format = $(this).data('format') || 'yyyy-MM-dd HH:mm';
-        datePicker({dateFmt: format});
+        datePicker({errDealMode:2, dateFmt:format});
     });
 
     // 显示产品图片

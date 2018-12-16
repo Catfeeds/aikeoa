@@ -13,20 +13,17 @@ return [
     'dialogs' => [
         'department' => [
             'name'  => '部门',
-            'table' => 'department',
-            'field' => 'department.title',
+            'model' => 'Aike\User\Department::Dialog',
             'url'   => 'user/department/dialog',
         ],
         'role' => [
             'name'  => '角色',
-            'table' => 'role',
-            'field' => 'role.title',
+            'model' => 'Aike\User\Role::Dialog',
             'url'   => 'user/role/dialog',
         ],
         'user' => [
             'name'  => '用户',
-            'table' => 'user',
-            'field' => 'user.nickname',
+            'model' => 'Aike\User\User::Dialog',
             'url'   => 'user/user/dialog',
         ],
     ],
@@ -57,11 +54,14 @@ return [
                 "index" => [
                     "name" => "列表"
                 ],
-                "view" => [
+                "show" => [
                     "name" => "查看"
                 ],
-                "add" => [
+                "create" => [
                     "name" => "新建"
+                ],
+                "edit" => [
+                    "name" => "编辑"
                 ],
                 "delete" => [
                     "name" => "删除"
@@ -77,14 +77,17 @@ return [
                 "index" => [
                     "name" => "列表"
                 ],
-                "view" => [
+                "show" => [
                     "name" => "查看"
                 ],
-                "add" => [
+                "create" => [
                     "name" => "新建"
                 ],
+                "edit" => [
+                    "name" => "编辑"
+                ],
                 "config" => [
-                    "name" => "控制器权限"
+                    "name" => "权限"
                 ],
                 "delete" => [
                     "name" => "删除"
@@ -100,8 +103,11 @@ return [
                 "index" => [
                     "name" => "列表"
                 ],
-                "add" => [
+                "create" => [
                     "name" => "新建"
+                ],
+                "edit" => [
+                    "name" => "编辑"
                 ],
                 "delete" => [
                     "name" => "删除"
@@ -114,8 +120,11 @@ return [
                 "index" => [
                     "name" => "列表"
                 ],
-                "add" => [
+                "create" => [
                     "name" => "新建"
+                ],
+                "edit" => [
+                    "name" => "编辑"
                 ],
                 "delete" => [
                     "name" => "删除"

@@ -147,7 +147,7 @@ function saveData() {
         // 简单验证表单
         if(validate.rules[key] == 'required') {
             if(value == '') {
-                $.toastr('error', validate.attrs[key] + ': 不能为空。', '错误');
+                $.toastr('error', validate.attrs[key] + ': 不能为空。');
                 passed = false;
                 return false;
             }
@@ -159,7 +159,7 @@ function saveData() {
         var products = t.jqGrid('getRowsData');
         if(products.v === true) {
             if(products.data.length === 0) {
-                $.toastr('error', '产品列表不能为空。', '错误');
+                $.toastr('error', '产品列表不能为空。');
             } else {
                 data['products'] = products.data;
                 $.post('{{url("store")}}', data, function(res) {

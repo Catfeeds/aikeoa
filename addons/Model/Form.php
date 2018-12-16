@@ -63,6 +63,7 @@ class Form
         foreach ($views as $k => $group) {
             $tpl = '';
             foreach ($group['fields'] as $view) {
+                $field = $fields[$view['field']];
 
                 // 跳过排除字段
                 if (in_array($table.'.'.$view['field'], $exclude)) {
@@ -107,38 +108,35 @@ class Form
                     $tpl .= '</div>';
                 }
 
-                if (isset($fields[$view['field']])) {
+                $field['model'] = $master;
 
-                    $field = $fields[$view['field']];
+                $attribute = [];
 
-                    $field['model'] = $master;
+                $p = $permission[$master['table']][$field['field']];
+                $field['is_read'] = $p['w'] == 1 ? 0 : 1;
+                $field['is_auto'] = $p['m'] == 1 ? 1 : 0;
+                $field['is_hide'] = $p['s'] == 1 ? 1 : $field['is_hide'];
 
-                    $attribute = [];
+                // 单据编码规则
+                $field['data_sn_rule'] = $master['data_sn_rule'];
+                $field['data_sn']      = $master['data_sn'];
 
-                    $p = $permission[$master['table']][$field['field']];
-                    $field['is_read'] = $p['w'] == 1 ? 0 : 1;
-                    $field['is_auto'] = $p['m'] == 1 ? 1 : 0;
-                    $field['is_hide'] = $p['s'] == 1 ? 1 : $field['is_hide'];
+                $validate = (array)$p['v'];
 
-                    // 单据编码规则
-                    $field['data_sn_rule'] = $master['data_sn_rule'];
-                    $field['data_sn']      = $master['data_sn'];
+                $required = '';
+                if (in_array('required', $validate)) {
+                    $required = '<span class="red">*</span> ';
+                    $attribute['required'] = 'required';
+                }
 
-                    $validate = (array)$p['v'];
+                $field['verify']    = $validate;
+                $field['attribute'] = $attribute;
+                $field['table']     = $table;
 
-                    $required = '';
-                    if (in_array('required', $validate)) {
-                        $required = '<span class="red">*</span> ';
-                        $attribute['required'] = 'required';
-                    }
+                $tooltip = $field['tips'] ? ' <a class="hinted" href="javascript:;" title="'.$field['tips'].'"><i class="fa fa-question-circle"></i></a>' : '';
 
-                    $field['verify']    = $validate;
-                    $field['attribute'] = $attribute;
-                    $field['table']     = $table;
-
-                    $tooltip = $field['tips'] ? ' <a class="hinted" href="javascript:;" title="'.$field['tips'].'"><i class="fa fa-question-circle"></i></a>' : '';
-
-                    $_replace['{'. $field['name'].'}'] = $required.$field['name'].$tooltip;
+                $_replace['{'. $field['name'].'}'] = $required.$field['name'].$tooltip;
+                if ($field['form_type']) {
                     $_replace['{'. $field['field'].'}'] = Field::{'content_'.$field['form_type']}($field, $row[$field['field']], $row);
                 }
             }
@@ -146,6 +144,7 @@ class Form
             // 有子表
             if ($sublist) {
                 foreach ($sublist as $_view) {
+
                     $model = DB::table('model')->where('table', $_view['field'])->first();
     
                     $fields = Field::where('model_id', $model['id'])
@@ -174,171 +173,169 @@ class Form
                     extract($_data);
                     
                     foreach ($views as $view) {
-                        if (isset($fields[$view['field']])) {
-                            $field = $fields[$view['field']];
-    
-                            $column = [];
-    
-                            // 数据类型格式化
-                            switch ($field['type']) {
-                                case 'DECIMAL':
-                                    list($_, $len) = explode(',', $field['length']);
-                                    $column['formatter'] = 'number';
-                                    $column['formatoptions'] = [
-                                        'decimalSeparator'   => '.',
-                                        'thousandsSeparator' => ',',
-                                        'decimalPlaces'      => (int)$len,
-                                        'defaultValue'       => number_format(0, $len),
-                                    ];
-                                    break;
-                            }
-    
-                            $setting = json_decode($field['setting'], true);
-    
-                            if ($setting['align']) {
-                                $column['align'] = $setting['align'];
-                            }
-    
-                            // 合计事件
-                            if ($setting['total_count']) {
-                                $counts[] = ['field' => $field['field'], 'type' => $setting['total_count']];
-                            }
-    
-                            // 行计事件
-                            if ($setting['row_count']) {
-                                $rowCounts[] = ['field' => $field['field'], 'rule' => $setting['row_count']];
-                            }
+                        $field = $fields[$view['field']];
 
-                            $permission_field = $permission_table[$field['field']];
-                            $validates = $permission_field['v'];
-    
-                            $required = '';
-    
-                            if ($validates) {
-                                $rules = [];
-    
-                                foreach ($validates as $validate) {
-                                    // 设置验证规则
-                                    $rules[$validate] = 1;
-                                }
-    
-                                // 整形规则格式化
-                                if ($rules['integer']) {
-                                    $column['formatter'] = 'integer';
-                                }
-    
-                                // 如果规则有必填和整形设置大于0
-                                if ($rules['required'] && $rules['integer']) {
-                                    $rules['minValue'] = 1;
-                                }
-                                $column['rules'] = $rules;
-                                $required = isset($rules['required']) ? '<span class="red">*</span> ' : '';
-                            }
-    
-                            $column['label'] = $required.$field['name'];
-                            $column['name']  = $field['field'];
-                            
-                            if ($field['form_type'] == 'label') {
-                                $column['editable'] = false;
-                            } else {
-                                $column['editable'] = $permission_field['w'] == 1 ? true : false;
-                            }
-    
-                            // 是否隐藏
-                            $column['hidden'] = $permission_field['s'] == 1 ? true : (bool)$view['hidden'];
-    
-                            // 字段宽度
-                            if ($setting['width']) {
-                                if ($setting['width'] == 'auto') {
-                                    $column['minWidth'] = 280;
-                                } else {
-                                    $column['width'] = $setting['width'];
-                                }
-                            }
+                        $column = [];
 
-                            if ($field['form_type'] == 'date') {
-                                $editoptions[$field['field']] = [
-                                    'form_type' => $field['form_type'],
-                                    'type'      => $setting['type'],
-                                    'field'     => $field['field'],
+                        // 数据类型格式化
+                        switch ($field['type']) {
+                            case 'DECIMAL':
+                                list($_, $len) = explode(',', $field['length']);
+                                $column['formatter'] = 'number';
+                                $column['formatoptions'] = [
+                                    'decimalSeparator'   => '.',
+                                    'thousandsSeparator' => ',',
+                                    'decimalPlaces'      => (int)$len,
+                                    'defaultValue'       => number_format(0, $len),
                                 ];
-                            }
-    
-                            if ($field['form_type'] == 'option') {
-                                $_option = option($setting['type'])->toArray();
-                                foreach ($_option as $k => $v) {
-                                    $_option[$k]['text'] = $v['name'];
-                                }
-                                $editCombo[$field['field']] = $_option;
-                                $editoptions[$field['field']] = [
-                                    'form_type' => $field['form_type'],
-                                    'field'     => $field['field'],
-                                ];
-                                $column['formatter'] = 'dropdown';
-                            }
-    
-                            if ($field['form_type'] == 'dataset') {
-    
-                                // 映射列表选择的字段
-                                $map = [];
-                                $_id   = explode(':', $setting['id']);
-                                $_name = explode(':', $setting['name']);
-    
-                                $map[$_id[0]]   = $_id[1];
-                                $map[$_name[0]] = $_name[1];
-    
-                                $maps = explode("\n", $setting['map']);
-                                foreach ($maps as $_map) {
-                                    $_map   = explode(':', $_map);
-                                    $map[trim($_map[0])] = trim($_map[1]);
-                                }
-    
-                                $dialog = Module::dialogs($setting['type']);
-    
-                                $editoptions[$field['field']] = [
-                                    'form_type' => $field['form_type'],
-                                    'title'     => $dialog['name'],
-                                    'type'      => $setting['type'],
-                                    'field'     => $field['field'],
-                                    'srcField'  => $_id[0],
-                                    'textField' => $field['field'],
-                                    'mapField'  => $map,
-                                    'display'   => $setting['display'],
-                                    'url'       => $dialog['url'],
-                                ];
-                            }
-                            $columns[] = $column;
+                                break;
                         }
-                    }
-    
-                    $buttons .= '<input type="hidden" name="models['.$model['table'].'][type]" value="'.$model['type'].'">';
-                    $buttons .= '<input type="hidden" name="models['.$model['table'].'][relation]" value="'.$model['relation'].'">';
-                    
-                    // 子表权限
-                    $multiselect = false;
-    
-                    // 子表查询
-                    $rows = $q->get();
 
-                    $_data = Hook::fire($model['table'].'.onAfterForm', ['rows' => $rows, 'gets' => $gets, 'id' => $id, 'multiselect' => $multiselect]);
-                    extract($_data);
-    
-                    $_options = [
-                        'autoOption'  => $permission_option['w'],
-                        'multiselect' => $multiselect,
-                        'editCombo'   => $editCombo,
-                        'columns'     => $columns,
-                        'editoptions' => $editoptions,
-                        'counts'      => $counts,
-                        'rowCounts'   => $rowCounts,
-                        'data'        => $rows,
-                        'title'       => $model['name'],
-                    ];
-    
-                    $js .= 'jqgridForm("'.$table.'","'.$model['table'].'", '.json_encode($_options, JSON_UNESCAPED_UNICODE).');';
-                    
-                    $_replace['{'.$model['table'].'}'] = '<div id="jqgrid-editor-container" class="form-jqgrid"><table id="grid_'.$model['table'].'"></table></div>';
+                        $setting = json_decode($field['setting'], true);
+
+                        if ($setting['align']) {
+                            $column['align'] = $setting['align'];
+                        }
+
+                        // 合计事件
+                        if ($setting['total_count']) {
+                            $counts[] = ['field' => $field['field'], 'type' => $setting['total_count']];
+                        }
+
+                        // 行计事件
+                        if ($setting['row_count']) {
+                            $rowCounts[] = ['field' => $field['field'], 'rule' => $setting['row_count']];
+                        }
+
+                        $permission_field = $permission_table[$field['field']];
+                        $validates = $permission_field['v'];
+
+                        $required = '';
+
+                        if ($validates) {
+                            $rules = [];
+
+                            foreach ($validates as $validate) {
+                                // 设置验证规则
+                                $rules[$validate] = 1;
+                            }
+
+                            // 整形规则格式化
+                            if ($rules['integer']) {
+                                $column['formatter'] = 'integer';
+                            }
+
+                            // 如果规则有必填和整形设置大于0
+                            if ($rules['required'] && $rules['integer']) {
+                                $rules['minValue'] = 1;
+                            }
+                            $column['rules'] = $rules;
+                            $required = isset($rules['required']) ? '<span class="red">*</span> ' : '';
+                        }
+
+                        $column['label'] = $required.$field['name'];
+                        $column['name']  = $field['field'];
+                        
+                        if ($field['form_type'] == 'label') {
+                            $column['editable'] = false;
+                        } else {
+                            $column['editable'] = $permission_field['w'] == 1 ? true : false;
+                        }
+
+                        // 是否隐藏
+                        $column['hidden'] = $permission_field['s'] == 1 ? true : (bool)$view['hidden'];
+
+                        // 字段宽度
+                        if ($setting['width']) {
+                            if ($setting['width'] == 'auto') {
+                                $column['minWidth'] = 280;
+                            } else {
+                                $column['width'] = $setting['width'];
+                            }
+                        }
+
+                        if ($field['form_type'] == 'date') {
+                            $editoptions[$field['field']] = [
+                                'form_type' => $field['form_type'],
+                                'type'      => $setting['type'],
+                                'field'     => $field['field'],
+                            ];
+                        }
+
+                        if ($field['form_type'] == 'option') {
+                            $_option = option($setting['type'])->toArray();
+                            foreach ($_option as $k => $v) {
+                                $_option[$k]['text'] = $v['name'];
+                            }
+                            $editCombo[$field['field']] = $_option;
+                            $editoptions[$field['field']] = [
+                                'form_type' => $field['form_type'],
+                                'field'     => $field['field'],
+                            ];
+                            $column['formatter'] = 'dropdown';
+                        }
+
+                        if ($field['form_type'] == 'dataset') {
+
+                            // 映射列表选择的字段
+                            $map = [];
+                            $_id   = explode(':', $setting['id']);
+                            $_name = explode(':', $setting['name']);
+
+                            $map[$_id[0]]   = $_id[1];
+                            $map[$_name[0]] = $_name[1];
+
+                            $maps = explode("\n", $setting['map']);
+                            foreach ($maps as $_map) {
+                                $_map   = explode(':', $_map);
+                                $map[trim($_map[0])] = trim($_map[1]);
+                            }
+
+                            $dialog = Module::dialogs($setting['type']);
+
+                            $editoptions[$field['field']] = [
+                                'form_type' => $field['form_type'],
+                                'title'     => $dialog['name'],
+                                'type'      => $setting['type'],
+                                'field'     => $field['field'],
+                                'srcField'  => $_id[0],
+                                'textField' => $field['field'],
+                                'mapField'  => $map,
+                                'display'   => $setting['display'],
+                                'url'       => $dialog['url'],
+                            ];
+                        }
+                        $columns[] = $column;
+                    }
                 }
+
+                $buttons .= '<input type="hidden" name="models['.$model['table'].'][type]" value="'.$model['type'].'">';
+                $buttons .= '<input type="hidden" name="models['.$model['table'].'][relation]" value="'.$model['relation'].'">';
+                
+                // 子表权限
+                $multiselect = false;
+
+                // 子表查询
+                $rows = $q->get();
+
+                $_data = Hook::fire($model['table'].'.onAfterForm', ['rows' => $rows, 'gets' => $gets, 'id' => $id, 'multiselect' => $multiselect]);
+                extract($_data);
+
+                $_options = [
+                    'autoOption'  => $permission_option['w'],
+                    'multiselect' => $multiselect,
+                    'editCombo'   => $editCombo,
+                    'columns'     => $columns,
+                    'editoptions' => $editoptions,
+                    'counts'      => $counts,
+                    'rowCounts'   => $rowCounts,
+                    'data'        => $rows,
+                    'title'       => $model['name'],
+                ];
+
+                $js .= 'jqgridForm("'.$table.'","'.$model['table'].'", '.json_encode($_options, JSON_UNESCAPED_UNICODE).');';
+                
+                $_replace['{'.$model['table'].'}'] = '<div id="jqgrid-editor-container" class="form-jqgrid"><table id="grid_'.$model['table'].'"></table></div>';
             }
             
             $html .= strtr($tpl, $_replace);

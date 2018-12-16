@@ -10,7 +10,7 @@
                 </div>
         </div>
 
-        <div class="form-group no-border">
+        <div class="form-group">
             <label class="col-sm-2 control-label" for="table">
                 <span class="red">*</span> 模型表名</label>
                 <div class="col-sm-10 control-text">
@@ -19,7 +19,7 @@
         </div>
 
         <div class="form-group">
-            <label class="col-sm-2 control-label" for="name">
+            <label class="col-sm-2 control-label" for="parent_id">
                 <span class="red">*</span> 父节模型</label>
                 <div class="col-sm-10 control-text">
                         <select class="form-control input-sm" name="parent_id" id="parent_id">
@@ -32,7 +32,7 @@
         </div>
 
         <div class="form-group">
-            <label class="col-sm-2 control-label" for="name">
+            <label class="col-sm-2 control-label" for="type">
             <span class="red">*</span> 模型类型</label>
             <div class="col-sm-10 control-text">
                     <select class="form-control input-sm" name="type" id="type">
@@ -43,7 +43,7 @@
         </div>
 
         <div class="form-group">
-            <label class="col-sm-2 control-label" for="name">
+            <label class="col-sm-2 control-label" for="relation">
             <span class="red">*</span> 关联外键</label>
             <div class="col-sm-10 control-text">
                 <input type="text" id="relation" name="relation" value="{{$row->relation}}" class="form-control input-sm">
@@ -51,7 +51,7 @@
         </div>
 
         <div class="form-group">
-            <label class="col-sm-2 control-label" for="name">
+            <label class="col-sm-2 control-label" for="sort">
             <span class="red">*</span> 数据排序</label>
             <div class="col-sm-10 control-text">
                 <input type="text" id="sort" name="sort" value="{{$row->sort}}" class="form-control input-sm">
@@ -59,7 +59,7 @@
         </div>
         @if($row->parent_id == 0)
         <div class="form-group">
-            <label class="col-sm-2 control-label" for="name">流程类型</label>
+            <label class="col-sm-2 control-label">流程类型</label>
             <div class="col-sm-10 control-text">
                 <label class="radio-inline"><input type="radio" @if($row['is_sort'] == 1) checked @endif value="1" name="is_sort"> 是 </label>
                 <label class="radio-inline"><input type="radio" @if($row['is_sort'] == 0) checked @endif value="0" name="is_sort"> 否 </label>
@@ -67,7 +67,7 @@
         </div>
 
         <div class="form-group">
-                <label class="col-sm-2 control-label" for="name">流程类型</label>
+                <label class="col-sm-2 control-label">流程类型</label>
                 <div class="col-sm-10 control-text">
                     <label class="radio-inline"><input type="radio" @if($row['is_flow'] == 1) checked @endif value="1" name="is_flow"> 固定 </label>
                     <label class="radio-inline"><input type="radio" @if($row['is_flow'] == 2) checked @endif value="2" name="is_flow"> 自由 </label>

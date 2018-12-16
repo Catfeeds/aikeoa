@@ -10,7 +10,11 @@ class Yunpian
         $ch = curl_init();
 
         /* 设置验证方式 */
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept:text/plain;charset=utf-8', 'Content-Type:application/x-www-form-urlencoded','charset=utf-8'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept:text/plain;charset=utf-8',
+            'Content-Type:application/x-www-form-urlencoded',
+            'charset=utf-8'
+        ]);
 
         /* 设置返回结果为流 */
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -33,12 +37,12 @@ class Yunpian
         $text = static::replaceWords($text);
 
         $ch = static::init();
-        $data = array(
+        $data = [
             'apikey' => static::$apikey,
             'text'   => static::$sign.$text,
             'mobile' => $mobile
-        );
-        //curl_setopt($ch, CURLOPT_URL, 'https://sms.yunpian.com/v2/sms/batch_send.json');
+        ];
+        // curl_setopt($ch, CURLOPT_URL, 'https://sms.yunpian.com/v2/sms/batch_send.json');
         curl_setopt($ch, CURLOPT_URL, 'http://crm.aikeoa.com/core/api/sms_send');
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
         $json = curl_exec($ch);
@@ -47,42 +51,12 @@ class Yunpian
         return $res;
     }
 
-    // 查询过滤词
-    public static function getBlackWord($text)
-    {
-        $ch = static::init();
-        curl_setopt($ch, CURLOPT_URL, 'https://sms.yunpian.com/v2/sms/get_black_word.json');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('text' => $text, 'apikey' => static::$apikey)));
-        $json = curl_exec($ch);
-        $res  = json_decode($json, true);
-        return $res;
-    }
-    
     // 过滤短信关键词
     public static function replaceWords($text)
     {
         // 替换括号
         $search  = ['【','】','[',']'];
         $replace = ['(',')','(',')'];
-
-        /*
-        // 营运商已经关闭屏蔽词过滤
-        $blacks = file_get_contents(base_path('resources/black.txt'));
-        $words  = explode("\n", $blacks);
-
-        foreach($words as $word) {
-
-            $word = trim($word);
-
-            if(strpos($text, $word) !== false) {
-                $len = mb_strlen($word);
-                $a = mb_substr($word, 0, 1, 'utf8');
-                $b = mb_substr($word, 1, $len, 'utf8');
-                $search[]  = $word;
-                $replace[] = $a." ".$b; //\xe2\x80\x8b
-            }
-        }
-        */
         return str_replace($search, $replace, $text);
     }
 
@@ -109,12 +83,12 @@ class Yunpian
 
         //$tpl = ('#code#').'='.urlencode('1234').'&'.urlencode('#company#').'='.urlencode('欢乐行');
 
-        $data = array(
+        $data = [
             'apikey'    => static::$apikey,
             'tpl_id'    => '1',
             'tpl_value' => $tpl,
             'mobile'    => $mobile
-        );
+        ];
 
         curl_setopt($ch, CURLOPT_URL, 'https://sms.yunpian.com/v2/sms/tpl_single_send.json');
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
