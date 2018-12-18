@@ -1,16 +1,16 @@
-{{$haeder["js"]}}
-<div class="panel b-a" id="{{$haeder['table']}}-controller">
+{{$header["js"]}}
+<div class="panel b-a" id="{{$header['table']}}-controller">
     @include('tabs2')
-    @include('haeders')
+    @include('headers')
     <div class="list-jqgrid">
-        <table id="{{$haeder['table']}}-grid"></table>
-        <div id="{{$haeder['table']}}-grid-page"></div>
+        <table id="{{$header['table']}}-grid"></table>
+        <div id="{{$header['table']}}-grid-page"></div>
     </div>
 </div>
 <script>
 (function($) {
 
-    var table = '{{$haeder["table"]}}';
+    var table = '{{$header["table"]}}';
     var config = window[table];
     var action = config.action;
     var search = config.search;

@@ -1,11 +1,11 @@
 <div class="wrapper">
     <table id="role-dialog">
         <thead>
-        <tr>
-            <th data-field="state" data-checkbox="true"></th>
-            <th data-field="text" data-align="left">名称</th>
-            <th data-field="id" data-width="60" data-align="center">ID</th>
-        </tr>
+            <tr>
+                <th data-field="state" data-checkbox="true"></th>
+                <th data-field="text" data-align="left">名称</th>
+                <th data-field="id" data-width="60" data-align="center">ID</th>
+            </tr>
         </thead>
     </table>
 </div>
@@ -54,7 +54,7 @@
         if(params.multi == 0) {
             selected = {};
         }
-        selected[row[sid]] = row.title;
+        selected[row[sid]] = row.name;
         setSelected();
     }
 
@@ -87,6 +87,14 @@
                    }
                 }
             });
+        },
+        onDblClickRow: function(row) {
+            setRow(row);
+            if (sid == 'sid') {
+                $('#modal-dialog-search').dialog('close');
+            } else {
+                $('#modal-dialog-user').dialog('close');
+            }
         },
         onCheck: function(row) {
             setRow(row);

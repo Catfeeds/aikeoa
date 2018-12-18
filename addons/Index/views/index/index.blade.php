@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8" />
     <title>{{$setting['title']}} - Powered By {{$setting['powered']}}</title>
@@ -16,7 +15,6 @@
     <![endif]-->
 
 </head>
-
 <body class="theme-{{auth()->user()->theme ?: 'blue'}}">
 
     <header class="header navbar">
@@ -70,7 +68,7 @@
                 </a>
 
                 <span class="thumb-md avatar">
-                    <a href="javascript:;" data-toggle="addtab" data-url="user/user/profile" data-id="02" data-name="个人资料">
+                    <a href="javascript:;" data-toggle="addtab" data-url="user/profile/index" data-id="02" data-name="个人资料">
                         <img src="{{avatar()}}" class="img-circle">
                         <i class="on md b-white bottom"></i>
                     </a>

@@ -5,6 +5,7 @@ use Request;
 use Input;
 use Validator;
 use URL;
+use View;
 use Auth;
 use AES;
 use Hook;
@@ -21,11 +22,53 @@ use Aike\Index\Access;
 
 class Form
 {
+    public static function dataFilter($options)
+    {
+        $table  = $options['table'];
+        $gets   = $options['gets'];
+        $tables = is_string($table) ? [$table] : $table;
+
+        $permission = DB::table('model_permission')
+        ->where('id', $gets['_permission_id'])
+        ->first();
+        $permissions = json_decode($permission['data'], true);
+
+        foreach ($tables as $table) {
+
+            $master = DB::table('model')
+            ->where('table', $table)
+            ->first();
+
+            $fields = DB::table('model_field')
+            ->where('model_id', $master['id'])
+            ->orderBy('sort', 'asc')
+            ->get()->keyBy('field');
+
+            $rows = $permissions[$table];
+            
+            foreach ($rows as $field => $permission) {
+                $value  = $gets[$table][$field];
+                $column = $fields[$field];
+                if ($permission['w'] == 1) {
+                    switch ($column['form_type'])
+                    {
+                        case 'address':
+                            $value = join("\n", $value);
+                            break;  
+                        case 'checkbox':
+                            break;
+                    }
+                    $gets[$table][$field] = $value;
+                }
+            }
+        }
+        return $gets;
+    }
+
     public static function make($options)
     {
         // 权限查询类型
         // $type_sql = [db_instr('type', 'create'), db_instr('type', 'edit')];
-        $exclude = (array)$options['exclude'];
         $table   = $options['table'];
         $row     = $options['row'];
 
@@ -55,7 +98,7 @@ class Form
         ->first();
         $views = json_decode($template['tpl'], true);
 
-        $first = false;
+        $first = true;
 
         $js = '<script type="text/javascript">jqgridFormList.'.$master['table'].' = [];';
         $js .= '$(function() {';
@@ -63,12 +106,8 @@ class Form
         foreach ($views as $k => $group) {
             $tpl = '';
             foreach ($group['fields'] as $view) {
+    
                 $field = $fields[$view['field']];
-
-                // 跳过排除字段
-                if (in_array($table.'.'.$view['field'], $exclude)) {
-                    continue;
-                }
 
                 // 是多行子表
                 if ($view['type'] == 1) {
@@ -76,10 +115,10 @@ class Form
                 }
 
                 if ($col == 0) {
-                    $tpl .= '<div class="form-group '.($first == false ? 'no-border' : '').'">';
+                    $tpl .= '<div class="form-group '.($first == true ? 'no-border' : '').'">';
                 }
 
-                $first = true;
+                $first = false;
 
                 // 补全错位
                 if ($col > 0 && $view['col'] == 12) {
@@ -91,8 +130,14 @@ class Form
 
                 $col += $view['col'];
 
+                $label = '{'.$field['name'].'}';
+                if ($field['form_type'] == 'checkbox') {
+                    $label = '';
+                }
+
                 if ($view['type'] == 0) {
-                    $tpl .= '<label class="col-sm-2 control-label">{'.$view['name'].'}</label>';
+
+                    $tpl .= '<label class="col-sm-2 control-label">'.$label.'</label>';
                 }
 
                 if ($view['type'] == 1) {
@@ -101,7 +146,7 @@ class Form
                     $right_col = $view['col'] - 2;
                 }
 
-                $tpl .= '<div class="col-sm-'.$right_col.' control-text">{'.$view['field'].'}</div>';
+                $tpl .= '<div class="col-sm-'.$right_col.' control-text">{'.$field['field'].'}</div>';
                 
                 if ($col == 12) {
                     $col = 0;
@@ -342,9 +387,11 @@ class Form
             if ($row['id']) {
                 $html .= '<input type="hidden" name="'.$table.'[id]" id="'.$table.'_id" value="'.$row['id'].'">';
             }
-            $html .= '<input type="hidden" name="uri" value="'.Request::module().'/'.Request::controller().'">';
-            $html .= '<input type="hidden" name="_token" value="'.csrf_token().'">';
         }
+
+        $html .= '<input type="hidden" name="_uri" value="'.Request::module().'/'.Request::controller().'">';
+        $html .= '<input type="hidden" name="_token" value="'.csrf_token().'">';
+        $html .= '<input type="hidden" name="_permission_id" value="'.$_permission['id'].'">';
 
         $js .= '});</script>';
 
@@ -353,6 +400,10 @@ class Form
         $.each(select2List, function(k, v) {
             select2List[k].el = $("#" + k).select2Field(v.options);
         });</script>';
+
+        View::share([
+            'model_view' => 1,
+        ]);
         
         return $html;
     }
@@ -360,7 +411,6 @@ class Form
     public static function show($options)
     {
         // 权限查询类型
-        $exclude = (array)$options['exclude'];
         $table   = $options['table'];
         $row     = $options['row'];
 
@@ -390,33 +440,36 @@ class Form
         ->first();
         $views = json_decode($template['tpl'], true);
 
-        $first = false;
+        $first = true;
         foreach ($views as $k => $group) {
             $tpl = '';
             foreach ($group['fields'] as $view) {
-                // 跳过排除字段
-                if (in_array($table.'.'.$view['field'], $exclude)) {
-                    continue;
-                }
+                $field = $fields[$view['field']];
 
                 if ($col == 0) {
-                    $tpl .= '<div class="show-group '.($first == false ? 'no-border' : '').'">';
+                    $tpl .= $first == false ? '<div class="clearfix"></div>' : '';
+                    $tpl .= '<div class="form-group '.($first == true ? 'no-border' : '').'">';
                 }
-
-                $first = true;
+                
+                $first = false;
 
                 // 补全错位
                 if ($col > 0 && $view['col'] == 12) {
-                    $tpl .= '<label class="col-sm-2 control-label" for=""></label>';
+                    $tpl .= '<label class="col-sm-2 control-label"></label>';
                     $tpl .= '<div class="col-sm'.($col - 10).' control-text"></div>';
-                    $tpl .= '</div><div class="clearfix"></div><div class="show-group">';
+                    $tpl .= '</div><div class="form-group">';
                     $col = 0;
                 }
-
+ 
                 $col += $view['col'];
 
+                $label = '{'.$field['name'].'}';
+                if ($field['form_type'] == 'checkbox') {
+                    $label = '';
+                }
+
                 if ($view['type'] == 0) {
-                    $tpl .= '<label class="col-sm-2 control-label" for="">{'.$view['name'].'}</label>';
+                    $tpl .= '<label class="col-sm-2 control-label" for="">'.$label.'</label>';
                 }
 
                 if ($view['type'] == 1) {
@@ -425,56 +478,55 @@ class Form
                     $right_col = $view['col'] - 2;
                 }
 
-                $tpl .= '<div class="col-sm-'.$right_col.' control-text">{'.$view['field'].'}</div>';
+                $tpl .= '<div class="col-sm-'.$right_col.' control-text">{'.$field['field'].'}</div>';
                 
                 if ($col == 12) {
                     $col = 0;
-                    $tpl .= '</div><div class="clearfix"></div>';
+                    $tpl .= '</div>';
                 }
 
-                if (isset($fields[$view['field']])) {
-                    $field = $fields[$view['field']];
+                $attribute = [];
 
-                    $attribute = [];
+                $p = $permission[$master['table']][$field['field']];
+                $field['is_read'] = $p['w'] == 1 ? 0 : 0;
+                $field['is_auto'] = $p['m'] == 1 ? 1 : 0;
+                $field['is_hide'] = $p['s'] == 1 ? 1 : $field['is_hide'];
+                $field['is_show'] = 1;
+                
+                // 单据编码规则
+                $field['data_sn_rule'] = $master['data_sn_rule'];
+                $field['data_sn']      = $master['data_sn'];
 
-                    $p = $permission[$master['table']][$field['field']];
-                    $field['is_read'] = $p['w'] == 1 ? 0 : 0;
-                    $field['is_auto'] = $p['m'] == 1 ? 1 : 0;
-                    $field['is_hide'] = $p['s'] == 1 ? 1 : $field['is_hide'];
-                    $field['is_show'] = 1;
-                    
-                    // 单据编码规则
-                    $field['data_sn_rule'] = $master['data_sn_rule'];
-                    $field['data_sn']      = $master['data_sn'];
+                $validate = (array)$p['v'];
 
-                    $validate = (array)$p['v'];
-
-                    $required = '';
-                    if (in_array('required', $validate)) {
-                        $required = '<span class="red">*</span> ';
-                        $attribute['required'] = 'required';
-                    }
-
-                    $field['verify']    = $validate;
-                    $field['attribute'] = $attribute;
-                    $field['table']     = $table;
-
-                    $tooltip = $field['tips'] ? ' <a class="hinted" href="javascript:;" title="'.$field['tips'].'"><i class="fa fa-question-circle"></i></a>' : '';
-
-                    $_replace['{'. $field['name'].'}']  = $required.$field['name'].$tooltip;
-                    $_replace['{'. $field['field'].'}'] = '<div>'.Field::{'content_'.$field['form_type']}($field, $row[$field['field']], $row).'</div>';
+                $required = '';
+                if (in_array('required', $validate)) {
+                    $required = '<span class="red">*</span> ';
+                    $attribute['required'] = 'required';
                 }
+
+                $field['verify']    = $validate;
+                $field['attribute'] = $attribute;
+                $field['table']     = $table;
+
+                $_replace['{'. $field['name'].'}']  = $field['name'];
+                $_replace['{'. $field['field'].'}'] = '<div>'.Field::{'content_'.$field['form_type']}($field, $row[$field['field']], $row).'</div>';
             }
             $html .= strtr($tpl, $_replace);
+            $html .= '<div class="clearfix"></div>';
         }
+
+        View::share([
+            'model_view' => 1,
+        ]);
+
         return $html;
     }
 
     public static function rules($options)
     {
         // 权限查询类型
-        $exclude = (array)$options['exclude'];
-        $table   = $options['table'];
+        $table = $options['table'];
 
         $type_sql = '('.join(' or ', [db_instr('type', 'create')]).')';
 
@@ -499,10 +551,6 @@ class Form
             $permissions = json_decode($_permission['data'], true);
             foreach ($permissions[$table] as $k => $v) {
                 if ($v['v']) {
-                    // 跳过排除字段
-                    if (in_array($table.'.'.$k, $exclude)) {
-                        continue;
-                    }
                     $rules[$table.'.'.$k] = join('|', (array)$v['v']);
                     $attributes[$table.'.'.$k] = $fields[$k]['name'];
                 }

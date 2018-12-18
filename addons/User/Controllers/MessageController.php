@@ -20,30 +20,30 @@ class MessageController extends Controller
      */
     public function indexAction()
     {
-        $haeder = Grid::haeder([
+        $header = Grid::header([
             'table'     => 'user_message',
             'referer'   => 1,
             'search'    => ['status' => 'unread'],
             'trash_btn' => 0,
         ]);
 
-        $cols = $haeder['cols'];
+        $cols = $header['cols'];
 
-        $cols['actionLink']['options'] = [[
+        $cols['actions']['options'] = [[
             'name'    => '显示',
             'action'  => 'show',
             'display' => 1,
         ]];
 
-        $search = $haeder['search_form'];
+        $search = $header['search_form'];
         $query = $search['query'];
 
         if (Request::method() == 'POST') {
             $model = Message::query();
-            foreach ($haeder['join'] as $join) {
+            foreach ($header['join'] as $join) {
                 $model->leftJoin($join[0], $join[1], $join[2], $join[3]);
             }
-            $model->orderBy($haeder['sort'], $haeder['order']);
+            $model->orderBy($header['sort'], $header['order']);
 
             if ($query['status']) {
                 $status = $query['status'] == 'unread' ? 0 : 1;
@@ -55,24 +55,24 @@ class MessageController extends Controller
                     $model->search($where);
                 }
             }
-            $rows = $model->paginate($search['limit'], $haeder['select'])->appends($query);
-            $items = Grid::dataFilter($rows, $haeder);
+            $rows = $model->paginate($search['limit'], $header['select'])->appends($query);
+            $items = Grid::dataFilter($rows, $header);
             return $items->toJson();
         }
 
-        $haeder['buttons'] = [
+        $header['buttons'] = [
             ['name' => '删除', 'icon' => 'fa-remove', 'action' => 'delete', 'display' => 1],
             ['action' => 'divider'],
             ['name' => '标记已读', 'icon' => '', 'action' => 'read', 'display' => 1],
             ['name' => '标记未读', 'icon' => '', 'action' => 'unread', 'display' => 1],
         ];
-        $haeder['cols'] = $cols;
-        $haeder['tabs'] = Message::$tabs;
-        $haeder['bys']  = Message::$bys;
-        $haeder['js']   = Grid::js($haeder);
+        $header['cols'] = $cols;
+        $header['tabs'] = Message::$tabs;
+        $header['bys']  = Message::$bys;
+        $header['js']   = Grid::js($header);
 
         return $this->display([
-            'haeder' => $haeder,
+            'header' => $header,
         ]);
     }
 

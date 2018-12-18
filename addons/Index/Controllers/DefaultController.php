@@ -9,7 +9,7 @@ class DefaultController extends Controller
     public function __construct()
     {
         parent::__construct();
-
+        
         UserAsset::setPermissions($this->permission);
 
         // 登录认证和RBAC检查

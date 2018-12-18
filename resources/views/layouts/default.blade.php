@@ -1,6 +1,6 @@
 @include('layouts/header')
 
-<div class="content m-n @if($flow) {{$flow}}-content @endif">
+<div class="content m-n">
 
     @if(Session::has('message'))
     <div class="m-sm alert alert-success alert-dismissible" role="alert">
@@ -25,7 +25,7 @@
     </div>
     @endif
 
-    <div class="content-body">
+    <div class="@if($model_view == 1) @else content-body @endif">
         {{$content}}
     </div>
 

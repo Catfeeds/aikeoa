@@ -90,7 +90,7 @@
                     - 
                     <input type="text" name="end_at" data-toggle="datetime" value="@datetime($task->end_at)" class="form-control input-sm input-inline">
                 @else
-                    <input type="hidden" name="start_at" value="@datetime($task->start_at)"> 
+                    <input type="hidden" name="start_at" value="@datetime($task->start_at)">
                     <input type="hidden" name="end_at" value="@datetime($task->end_at)">
                     @datetime($task->start_at)
                     - 
@@ -121,105 +121,94 @@
             </td>
         </tr>
 
-    </table></div>
+    </table>
+</div>
 
+<div class="task-subtask" id="task-subtask-{{$task->id}}">
 
-                <div class="task-subtask" id="task-subtask-{{$task->id}}">
-
-                    <div class="panel b-a">
-                        <div class="panel-heading b-b b-light">
-                            
-                            <span class="font-bold">子任务 <span class="label bg-light">{{count($tasks)}}</span></span>
-                            @if($permission['add-subtask'] == 1)
-                                <a href="javascript:addSubTask({{$task->id}});" class="option option-add"><i class="fa fa-fw fa-plus"></i>添加子任务</a>
-                            @endif
-                        </div>
-                        <ul class="list-group list-group-lg no-bg auto">
-
-                    @if($tasks)
-                    @foreach($tasks as $v)
-
-                            <li class="list-group-item clearfix">
-                            <span class="pull-left thumb-sm avatar m-r">
-                                <img src="{{avatar($v['user_id'])}}">
-                            </span>
-                            <span class="clear">
-                                <span>
-                                    <span class="pull-right text-muted">@datetime($v->created_at)</span>
-                                    {{get_user($v['user_id'], 'nickname', false)}}
-                                </span>
-                                <small class="text-muted clear text-ellipsis">
-                                        @if($v->progress == 1)
-                                        <span class="label label-success">完成</span>
-                                    @else
-                                        @if(auth()->id() == $v->user_id)
-                                            <span class="label label-danger">执行中</span>
-                                        @else
-                                            <span class="label label-info">执行中</span>
-                                        @endif
-                                    @endif
-                                        <a href="javascript:editSubTask({{$v->id}});">{{$v->name}}</a>
-                                </small>
-                            </span>
-                            </li>
-                    @endforeach
-                    @endif
-
-                </ul>
-            </div>
-
-                </div>
-
-
-                <div class="task-log" id="task-log-{{$task->id}}">
-
-                    <div class="panel b-a m-b-none">
-                        <div class="panel-heading b-b b-light">
-                            <span class="font-bold">评论列表 <span class="label bg-light">{{count($tasks)}}</span></span>
-                            @if($permission['add-comment'] == 1)
-                            <a href="javascript:addComment({{$task->id}});" class="option option-add"><i class="fa fa-fw fa-plus"></i>添加回复</a>
-                            @endif
-                        </div>
-                        <div class="panel-body">
-
-                    @if($logs)
-                    @foreach($logs as $log)
-                        @if($log->type == 'comment')
-
-                            <div class="m-l-lg">
-                                <a class="pull-left thumb-sm avatar m-l-n-md">
-                                  <img src="{{avatar($log->user_id)}}" alt="{{$log->user}}">
-                                </a>          
-                                <div class="m-l-lg panel b-a">
-                                  <div class="panel-heading pos-rlt b-b b-light">
-                                    <span class="arrow left"></span>                    
-                                    <span>{{$log->user}}</span>
-                                    <span class="text-muted m-l-sm pull-right">
-                                        <i class="fa fa-clock-o"> </i> @datetime($log->created_at)
-                                    </span>
-                                  </div>
-                                  <div class="panel-body">
-                                    <div>{{$log->content}}</div>
-                                  </div>
-                                </div>
-                            </div>
-                            <!--
-                                <p class="task-log-comment"><span class="time">@datetime($log->created_at)</span><div class="task-log-user">{{$log->user}}</div>{{$log->content}}</p>
-                            -->
-                        @else 
-                            <p class="task-log-content"><span class="time">@datetime($log->created_at)</span>{{$log->user}} {{$log->content}}</p>
-                        @endif
-                    @endforeach
-                    @endif
-
-                </div>
+    <div class="panel b-a">
+        <div class="panel-heading b-b b-light">
             
-            </div>
+            <span class="font-bold">子任务 <span class="label bg-light">{{count($tasks)}}</span></span>
+            @if($permission['add-subtask'] == 1)
+                <a href="javascript:addSubTask({{$task->id}});" class="option option-add"><i class="fa fa-fw fa-plus"></i>添加子任务</a>
+            @endif
+        </div>
 
-                </div>
-
+        <ul class="list-group list-group-lg no-bg auto">
+        @if($tasks)
+        @foreach($tasks as $v)
+        <li class="list-group-item clearfix">
+            <span class="pull-left thumb-sm avatar m-r">
+                <img src="{{avatar($v['user_id'])}}">
+            </span>
+            <span class="clear">
+                <span>
+                    <span class="pull-right text-muted">@datetime($v->created_at)</span>
+                    {{get_user($v['user_id'], 'nickname', false)}}
+                </span>
+                <small class="text-muted clear text-ellipsis">
+                        @if($v->progress == 1)
+                        <span class="label label-success">完成</span>
+                    @else
+                        @if(auth()->id() == $v->user_id)
+                            <span class="label label-danger">执行中</span>
+                        @else
+                            <span class="label label-info">执行中</span>
+                        @endif
+                    @endif
+                        <a href="javascript:editSubTask({{$v->id}});">{{$v->name}}</a>
+                </small>
+            </span>
+        </li>
+        @endforeach
+        @endif
+        </ul>
     </div>
 
+</div>
+
+<div class="task-log" id="task-log-{{$task->id}}">
+
+    <div class="panel b-a m-b-none">
+        <div class="panel-heading b-b b-light">
+            <span class="font-bold">评论列表 <span class="label bg-light">{{count($tasks)}}</span></span>
+            @if($permission['add-comment'] == 1)
+            <a href="javascript:addComment({{$task->id}});" class="option option-add"><i class="fa fa-fw fa-plus"></i>添加回复</a>
+            @endif
+        </div>
+        <div class="panel-body">
+        @if($logs)
+        @foreach($logs as $log)
+            @if($log->type == 'comment')
+
+                <div class="m-l-lg">
+                    <a class="pull-left thumb-sm avatar m-l-n-md">
+                        <img src="{{avatar($log->user_id)}}" alt="{{$log->user}}">
+                    </a>          
+                    <div class="m-l-lg panel b-a">
+                        <div class="panel-heading pos-rlt b-b b-light">
+                        <span class="arrow left"></span>                    
+                        <span>{{$log->user}}</span>
+                        <span class="text-muted m-l-sm pull-right">
+                            <i class="fa fa-clock-o"> </i> @datetime($log->created_at)
+                        </span>
+                        </div>
+                        <div class="panel-body">
+                        <div>{{$log->content}}</div>
+                        </div>
+                    </div>
+                </div>
+                <!--
+                    <p class="task-log-comment"><span class="time">@datetime($log->created_at)</span><div class="task-log-user">{{$log->user}}</div>{{$log->content}}</p>
+                -->
+            @else 
+                <p class="task-log-content"><span class="time">@datetime($log->created_at)</span>{{$log->user}} {{$log->content}}</p>
+            @endif
+        @endforeach
+        @endif
+        </div>
+    </div>
 </div>
 
 <input type="hidden" name="type" value="{{$type}}">

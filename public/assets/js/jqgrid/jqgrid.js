@@ -138,13 +138,6 @@ $.extend($.jgrid.defaults, {
     editComboCache: {},
     panelHeight: 0,
     rawData: [],
-    cellEvent: function(cm, cellval, opts, rwdat, _act) {
-        var links = [];
-        $.each(cm.events, function(i, row) {
-            links.push('<a data-toggle="event" class="option" data-action="'+ row.action +'" data-id="'+ rwdat.id +'" href="javascript:;">'+ row.name +'</a>');
-        });
-        return links.join(' ');
-    },
     loadComplete: function(res) {
         $(this).jqGrid('initPagination', res);
     },
@@ -155,12 +148,7 @@ $.extend($.jgrid.defaults, {
             e.stopPropagation();
             var option = $(this).hasClass('fa-plus') === true ? 'plus' : 'delete';
             $.fn.fmatter.rowoptions.call(this, option);
-        });
-
-        // 监听操作
-        $(this).on('click', '[data-toggle="actionlink"]', function(e) {
-            e.stopPropagation();
-            actionLink($(this).data());
+            
         });
 
     },
@@ -202,7 +190,7 @@ $.extend($.jgrid.defaults, {
 
 $.extend($.fn.fmatter, {
     checkbox: function(cellvalue, options, rowdata) {
-        return "<input type='checkbox' class='cbox checkbox' id='abc-222' name='abc-222' />";
+        return "<input type='checkbox' class='cbox checkbox' id='abc' name='abc' />";
     }
 });
 
@@ -250,7 +238,7 @@ $.extend($.fn.fmatter, {
 });
 
 $.extend($.fn.fmatter, {
-    actionLink: function(cellvalue, options, rowdata) {
+    actions: function(cellvalue, options, rowdata) {
         var rows = options.colModel.options;
         var links = [];
         $.each(rows, function(i, row) {

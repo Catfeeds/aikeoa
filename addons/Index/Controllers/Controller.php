@@ -13,7 +13,7 @@ class Controller extends BaseController
     /**
      * @var 程序版本
      */
-    public $version = '<a href="http://www.aikeoa.com">爱客办公</a> 1.1.2';
+    public $version = '<a href="http://www.aikeoa.com">爱客办公</a> 1.0.0';
 
     /**
      * @var 开发商名称

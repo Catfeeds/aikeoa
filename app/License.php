@@ -1,16 +1,28 @@
 <?php namespace App;
 
+use Aike\User\User;
+use Aike\Customer\Customer;
+
 class License
 {
-    public function check($type, $count)
+    public function check($type)
     {
-        $license = [
-            'role'     => 9999,
+        $data = [
             'user'     => 9999,
-            'supplier' => 9999,
             'customer' => 9999,
         ];
-        return $count >= $license[$type] ? true : false;
+
+        if ($type == 'user') {
+            $count = User::group('user')->count('id');
+            if ($count > $data['user']) {
+                abort_error('无法新建用户授权许可不足。');
+            }
+        } else if ($type == 'customer') {
+            $count = Customer::count('id');
+            if ($count > $data['customer']) {
+                abort_error('无法新建客户授权许可不足。');
+            }
+        }
     }
 
     /**
@@ -18,6 +30,10 @@ class License
      */
     public function demoCheck($table)
     {
+        if (env('DEMO_VERSION') == false) {
+            return true;
+        }
+
         $demoDatas = [
             'role',
             'department',
@@ -54,13 +70,10 @@ class License
             'setting',
         ];
 
-        if (env('DEMO_VERSION') == false) {
-            return true;
-        }
-
         if (in_array($table, $demoDatas)) {
             return false;
         }
+        
         return true;
     }
 }

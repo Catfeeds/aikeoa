@@ -20,31 +20,31 @@ class DepartmentController extends DefaultController
     {
         $display = $this->access;
 
-        $haeder = Grid::haeder([
+        $header = Grid::header([
             'table'   => 'department',
             'referer' => 1,
             'search'  => ['by' => ''],
         ]);
 
-        $cols = $haeder['cols'];
+        $cols = $header['cols'];
         $cols = Grid::addCols($cols, 'name', [
             'label' => '用户数',
             'name'  => 'user_count',
             'align' => 'center',
         ]);
 
-        $cols['actionLink']['options'] = [[
+        $cols['actions']['options'] = [[
             'name'    => '编辑',
             'action'  => 'edit',
             'display' => $display['edit'],
         ]];
 
-        $search = $haeder['search_form'];
+        $search = $header['search_form'];
         $query = $search['query'];
 
         if (Request::method() == 'POST') {
-            $model = Department::setBy($haeder);
-            foreach ($haeder['join'] as $join) {
+            $model = Department::setBy($header);
+            foreach ($header['join'] as $join) {
                 $model->leftJoin($join[0], $join[1], $join[2], $join[3]);
             }
             $model->leftJoin('user', 'user.department_id', '=', 'department.id');
@@ -56,28 +56,28 @@ class DepartmentController extends DefaultController
                 }
             }
 
-            $model->select($haeder['select'])
+            $model->select($header['select'])
             ->addSelect(DB::raw('department.parent_id,count(user.id) as user_count'))
             ->groupBy('department.id');
 
             $items = $model->get()->toNested();
-            $items = Grid::dataFilter($items, $haeder);
+            $items = Grid::dataFilter($items, $header);
             return $items->toJson();
         }
 
-        $haeder['buttons'] = [[
+        $header['buttons'] = [[
             'name'    => '删除',
             'icon'    => 'fa-remove',
             'action'  => 'delete',
             'display' => $display['delete']
         ]];
-        $haeder['cols'] = $cols;
-        $haeder['tabs'] = User::$tabs;
-        $haeder['bys']  = Department::$bys;
-        $haeder['js']   = Grid::js($haeder);
+        $header['cols'] = $cols;
+        $header['tabs'] = User::$tabs;
+        $header['bys']  = Department::$bys;
+        $header['js']   = Grid::js($header);
 
         return $this->display([
-            'haeder' => $haeder,
+            'header' => $header,
         ]);
     }
 
@@ -108,15 +108,15 @@ class DepartmentController extends DefaultController
         $id = (int)Input::get('id');
         $department = Department::find($id);
 
-        $options = [
+        $header = [
             'table' => 'department',
         ];
         if ($department->id) {
-            $options['row'] = $department;
+            $header['row'] = $department;
         }
-        $tpl = Form::make($options);
+        $header['tpl'] = Form::make($header);
         return $this->render([
-            'tpl' => $tpl,
+            'header' => $header,
         ], 'create');
     }
 
@@ -128,7 +128,7 @@ class DepartmentController extends DefaultController
     public function dialogAction()
     {
         $search = search_form([], [
-            ['text','department.title','名称'],
+            ['text','department.name','名称'],
             ['text','department.id','ID'],
         ]);
 
@@ -137,13 +137,13 @@ class DepartmentController extends DefaultController
             $data  = [];
             foreach ($rows as $row) {
                 $row['sid'] = 'd'.$row['id'];
-                $row['text'] = $row['layer_space'].$row['title'];
+                $row['text'] = $row['layer_space'].$row['name'];
                 $data[] = $row;
             }
             $data[] = [
                 'id'    => 0,
                 'sid'   => 'all',
-                'title' => '全体人员',
+                'name'  => '全体人员',
                 'text'  => '全体人员',
             ];
             return response()->json(['data' => $data]);

@@ -509,6 +509,7 @@ class Field extends BaseModel
      */
     public static function content_custom($field, $content = '')
     {
+        $content = '<div id="'.$field['table'].'_'.$field['field'].'">'.$content.'</div>';
         return $content;
     }
 
@@ -1023,6 +1024,10 @@ class Field extends BaseModel
 
         $content = empty($content) ? ($setting['default'] == 1 ? date($type): '') : ($save == 'date' ? $content : date($type, $content));
 
+        if ($content == '0000-00-00' || $content == '0000-00-00 00:00:00') {
+            $content = '';
+        }
+
         if ($field['is_show']) {
             return $content;
         }
@@ -1030,7 +1035,7 @@ class Field extends BaseModel
         if ($field['is_read']) {
             $field['attribute']['readonly'] = 'readonly';
         } else {
-            $field['attribute']['onclick'] = "WdatePicker({dateFmt:'".$time_format."'});";
+            $field['attribute']['onclick'] = "datePicker({errDealMode:2, dateFmt:'".$time_format."'});";
         }
         return '<input type="text" value="' .$content. '" ' . Field::content_attribute($field['attribute']) . ' />';
     }
@@ -1052,22 +1057,21 @@ class Field extends BaseModel
         return $str;
     }
 
-    public static function content_checkbox($name, $content = '', $field = '')
+    public static function content_checkbox($field, $content = '')
     {
+        $field   = Field::content_field($field);
         // 配置
-        $setting = isset($field['setting']) ? json_decode($field['setting'], true) : $field;
+        $setting = $field['setting'];
         $default = $setting['default'];
-        $content = is_null($content) ? ($default ? explode(',', $default) : '') : string2array($content);
-        $select  = explode(chr(13), $setting['content']);
-        $str     = '';
-        foreach ($select as $t) {
-            $n    = $v = $selected = '';
-            list($n, $v) = explode('|', $t);
-            $v    = is_null($v) ? trim($n) : trim($v);
-            $selected = is_array($content) && in_array($v, $content) ? ' checked' : '';
-            $str.= $n . '&nbsp;<input type="checkbox" name="data[' . $name . '][]" value="' . $v . '" ' . $selected . ' />&nbsp;&nbsp;';
+        $content = is_null($content) ? $default : $content;
+
+        $checked = $content == 1 ? 'checked="checked"' : '';
+
+        if ($field['is_show']) {
+            return '<label class="i-checks i-checks-sm m-b-none" style="font-weight:normal;"><input type="checkbox" disabled="disabled" '.$checked.'><i></i>'.$field['name'].'</label>';
+        } else {
+            return '<label class="i-checks i-checks-sm m-t-xs m-b-none" style="font-weight:normal;"><input type="checkbox" name="'. $field['data'] . '" value="1" '.$checked.'><i></i>'.$field['name'].'</label>';
         }
-        return $str;
     }
 
     public static function content_image($name, $content = '', $field = '')

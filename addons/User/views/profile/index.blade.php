@@ -4,8 +4,8 @@
 
     <div class="panel-heading tabs-box">
         <ul class="nav nav-tabs">
-            <li class="@if(Request::action() == 'profile') active @endif">
-                <a class="text-sm" href="{{url('profile')}}">我的资料</a>
+            <li class="@if(Request::action() == 'index') active @endif">
+                <a class="text-sm" href="{{url('index')}}">我的资料</a>
             </li>
             <li class="@if(Request::action() == 'password') active @endif">
                 <a class="text-sm" href="{{url('password')}}">修改密码</a>

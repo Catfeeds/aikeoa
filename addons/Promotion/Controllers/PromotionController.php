@@ -18,15 +18,15 @@ class PromotionController extends DefaultController
 
     public function indexAction()
     {
-        $haeder = Grid::haeder([
+        $header = Grid::header([
             'table'   => 'promotion',
             'referer' => 1,
             'search'  => ['by' => ''],
         ]);
 
-        $cols = $haeder['cols'];
+        $cols = $header['cols'];
 
-        $cols['actionLink']['options'] = [[
+        $cols['actions']['options'] = [[
             'name'    => '显示',
             'action'  => 'show',
             'display' => $this->access['show'],
@@ -36,15 +36,15 @@ class PromotionController extends DefaultController
             'display' => $this->access['edit'],
         ]];
 
-        $search = $haeder['search_form'];
+        $search = $header['search_form'];
         $query = $search['query'];
 
         if (Request::method() == 'POST') {
-            $model = Promotion::setBy($haeder);
-            foreach ($haeder['join'] as $join) {
+            $model = Promotion::setBy($header);
+            foreach ($header['join'] as $join) {
                 $model->leftJoin($join[0], $join[1], $join[2], $join[3]);
             }
-            $model->orderBy($haeder['sort'], $haeder['order']);
+            $model->orderBy($header['sort'], $header['order']);
 
             // 公司权限
             /*
@@ -61,33 +61,33 @@ class PromotionController extends DefaultController
             }
 
             if ($query['export']) {
-                $rows = $model->get($haeder['select']);
+                $rows = $model->get($header['select']);
             } else {
-                $rows = $model->paginate($search['limit'], $haeder['select'])->appends($query);
+                $rows = $model->paginate($search['limit'], $header['select'])->appends($query);
             }
 
-            $items = Grid::dataFilter($rows, $haeder);
+            $items = Grid::dataFilter($rows, $header);
 
             if ($query['export']) {
-                unset($cols['action']);
-                writeExcel($cols, $items, $haeder['name']. date('Y-m-d'));
+                unset($cols['actions']);
+                writeExcel($cols, $items, $header['name']. date('Y-m-d'));
             }
 
             return $items->toJson();
         }
 
-        $haeder['buttons'] = [
+        $header['buttons'] = [
             ['name' => '删除', 'icon' => 'fa-remove', 'action' => 'delete', 'display' => $this->access['delete']],
             ['name' => '导出', 'icon' => 'fa-share', 'action' => 'export', 'display' => $this->access['export']],
         ];
 
-        $haeder['cols'] = $cols;
-        $haeder['tabs'] = Promotion::$tabs;
-        $haeder['bys']  = Promotion::$bys;
-        $haeder['js']   = Grid::js($haeder);
+        $header['cols'] = $cols;
+        $header['tabs'] = Promotion::$tabs;
+        $header['bys']  = Promotion::$bys;
+        $header['js']   = Grid::js($header);
 
         return $this->display([
-            'haeder' => $haeder,
+            'header' => $header,
         ]);
     }
 
@@ -128,7 +128,7 @@ class PromotionController extends DefaultController
         
         return $this->display([
             'tpl'    => $tpl,
-            'haeder' => $options,
+            'header' => $options,
         ], 'create');
     }
 

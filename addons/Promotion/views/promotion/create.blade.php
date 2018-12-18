@@ -4,7 +4,7 @@ body {
 }
 </style>
 <div class="panel b-a">
-<form class="form-horizontal form-controller" method="post" action="{{url()}}" id="{{$haeder['table']}}-form-edit" name="{{$haeder['table']}}_form_edit">
+<form class="form-horizontal form-controller" method="post" action="{{url()}}" id="{{$header['table']}}-form-edit" name="{{$header['table']}}_form_edit">
     <div class="panel-heading text-base b-b">
         <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-check-circle"></i> 提交</button>
     </div>
@@ -12,7 +12,7 @@ body {
 </form>
 </div>
 <script>
-var table = '{{$haeder["table"]}}';
+var table = '{{$header["table"]}}';
 $(function() {
     ajaxSubmit('#' + table + '-form-edit', function(res) {
         if (res.status) {

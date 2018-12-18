@@ -341,8 +341,12 @@
                     }
                 });
             } else {
-                var index = layer.open({
-                    title: '<i class="fa fa-columns"></i> ' + me.name +'</a>',
+                layer.open({
+                    // title: '<i class="fa fa-columns"></i> ' + me.name +'</a>',
+                    skin: 'layui-layer-aikeoa',
+                    closeBtn: 2,
+                    scrollbar: false,
+                    title: false,
                     type: 2,
                     move: false,
                     area: ['100%', '100%'],
@@ -404,7 +408,6 @@
                 success: function(res) {
                     $.toastr('success', res.data);
                     grid.trigger('reloadGrid');
-                    console.log(grid);
                     $(this).dialog("close");
                 },
                 error: function(res) {
@@ -434,15 +437,15 @@
                 });
             } else {
                 var index = layer.open({
-                    title: '<i class="fa fa-file-text-o"></i> 新建' + me.name,
+                    // title: '<i class="fa fa-file-text-o"></i> 新建' + me.name,
+                    skin: 'layui-layer-aikeoa',
+                    scrollbar: false,
+                    closeBtn: 2,
+                    title: false,
                     type: 2,
                     move: false,
                     area: ['100%', '100%'],
                     content: app.url(this.routes.create),
-                    end: function() {
-                        // $.toastr('success', '恭喜您，新建成功。');
-                        grid.trigger('reloadGrid');
-                    }
                 });
             }
         }
@@ -469,15 +472,15 @@
                 });
             } else {
                 var index = layer.open({
-                    title: '<i class="fa fa-file-text-o"></i> 编辑' + me.name,
+                    // title: '<i class="fa fa-file-text-o"></i> 编辑' + me.name,
+                    skin: 'layui-layer-aikeoa',
+                    scrollbar: false,
+                    closeBtn: 2,
+                    title: false,
                     type: 2,
                     move: false,
                     area: ['100%', '100%'],
                     content: app.url(this.routes.edit, {id: data.id}),
-                    end: function() {
-                        // $.toastr('success', '恭喜您，编辑成功。');
-                        grid.trigger('reloadGrid');
-                    }
                 });
             }
         }

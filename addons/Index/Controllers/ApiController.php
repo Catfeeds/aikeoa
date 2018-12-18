@@ -14,12 +14,16 @@ class ApiController extends Controller
 {
     public function helloAction()
     {
+        /*
         \App\Jobs\SendSite::dispatch([1], '您的验证码是0123');
         exit;
 
         DB::enableQueryLog();
         $user = DB::table('user as u')->orderBy('id', 'desc')->orderBy('username', 'asc')->first();
         print_r(DB::getQueryLog());
+        */
+
+        echo \Hash::make('123456');
 
         exit;
         /*

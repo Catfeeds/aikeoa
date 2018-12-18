@@ -19,17 +19,17 @@ use Aike\Model\StepLog;
 
 class Grid
 {
-    public static function dataFilter($items, $haeder, $callback = null)
+    public static function dataFilter($items, $header, $callback = null)
     {
         $dialogs = [];
 
-        $items->transform(function ($item) use ($haeder, $callback, &$dialogs) {
+        $items->transform(function ($item) use ($header, $callback, &$dialogs) {
 
             if (is_callable($callback)) {
                 $item = $callback($item);
             }
 
-            foreach ($haeder['columns'] as $column) {
+            foreach ($header['columns'] as $column) {
 
                 $field   = $column['field'];
                 $setting = $column['setting'];
@@ -52,10 +52,27 @@ class Grid
                     if ($setting['save'] == 'u') {
                         $value = date($type, $value);
                     }
+                    if ($value == '0000-00-00' || $value == '0000-00-00 00:00:00') {
+                        $value = '';
+                    }
                 }
 
                 if ($column['form_type'] == 'option') {
                     $value = option($type, $value);
+                }
+
+                if ($column['form_type'] == 'checkbox') {
+                    $select = explode("\n", $setting['content']);
+                    $res = [];
+                    foreach ($select as $t) {
+                        $n = $v = '';
+                        list($n, $v) = explode('|', $t);
+                        $v = is_null($v) ? trim($n) : trim($v);
+                        if($v == $value) {
+                            $res[] = $n;
+                        }
+                    }
+                    $value = join(',', $res);
                 }
 
                 if ($column['form_type'] == 'select') {
@@ -73,7 +90,7 @@ class Grid
                 }
 
                 if ($field == 'step_sn') {
-                    $steps = $haeder['steps'];
+                    $steps = $header['steps'];
                     $value = $steps[$value]['name'];
                 }
 
@@ -110,14 +127,6 @@ class Grid
         } else {
             $items = $rows;
         }
-        /*
-        $items->transform(function ($item) use ($dialogs, $rows) {
-            foreach ($dialogs as $field => $dialog) {
-                $item[$field] = $dialog['rows'][$item[$field]];
-            }
-            return $item;
-        });
-        */
         return $items;
     }
 
@@ -133,7 +142,7 @@ class Grid
         return $rows;
     }
 
-    public function haeder($options)
+    public function header($options)
     {
         $table = $options['table'];
         $model  = Model::where('table', $table)->first();
@@ -240,6 +249,10 @@ class Grid
                         $form_type = 'text';
                     }
 
+                    if ($field['form_type'] == 'checkbox') {
+                        $form_type = 'text';
+                    }
+
                     if ($field['form_type'] == 'sn') {
                         $form_type = 'text';
                     }
@@ -263,9 +276,9 @@ class Grid
         }
 
         // 动作列
-        $res['cols']['actionLink'] = [
-            'name'      => 'actionLink',
-            'formatter' => 'actionLink',
+        $res['cols']['actions'] = [
+            'name'      => 'actions',
+            'formatter' => 'actions',
             'options'   => [],
             'label'     => ' ',
             'width'     => 100,
@@ -307,11 +320,11 @@ class Grid
         return $res;
     }
 
-    public static function js($haeder)
+    public static function js($header)
     {
-        $table = $haeder['table'];
+        $table = $header['table'];
         $cols = [];
-        foreach ($haeder['cols'] as $field => $col) {
+        foreach ($header['cols'] as $field => $col) {
             if ($field == 'action' && empty($col['events'])) {
                 continue;
             }
@@ -324,13 +337,13 @@ class Grid
             'search' => [
                 'simple' => [
                     'el'    => null,
-                    'query' => (array)$haeder['search_form']["query"],
+                    'query' => (array)$header['search_form']["query"],
                 ],
                 'advanced' => [
                     'el'    => null,
-                    'query' => (array)$haeder['search_form']["query"],
+                    'query' => (array)$header['search_form']["query"],
                 ],
-                'forms' => (array)$haeder['search_form']["forms"],
+                'forms' => (array)$header['search_form']["forms"],
             ],
             'cols' => $cols,
         ];
@@ -343,7 +356,7 @@ class Grid
             'show'   => $mc.'/show',
         ];
         $js = 'var '.$table.' = '.json_encode($search, JSON_UNESCAPED_UNICODE).';';
-        $js .= "$table.action = new jqgridAction('".$table."', '".$haeder['name']."');";
+        $js .= "$table.action = new jqgridAction('".$table."', '".$header['name']."');";
         $js .= "$table.action.routes = ".json_encode($routes, JSON_UNESCAPED_UNICODE).';';
         $res = '<script>'.$js.'</script>';
         return $res;

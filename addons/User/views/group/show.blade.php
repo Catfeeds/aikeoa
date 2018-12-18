@@ -9,6 +9,6 @@ body {
         <div class="text-sm"><i class="fa text-md fa-list-alt"></i> 职位</div>
     </div>
 	<div class="form-controller">
-		{{$tpl}}
+        {{$header['tpl']}}
 	</div>
 </div>

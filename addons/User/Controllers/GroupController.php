@@ -17,34 +17,30 @@ class GroupController extends DefaultController
 
     public function indexAction()
     {
-        $haeder = Grid::haeder([
+        $header = Grid::header([
             'table'     => 'user_group',
             'referer'   => 1,
             'search'    => ['by' => ''],
             'trash_btn' => 0,
         ]);
 
-        $cols = $haeder['cols'];
+        $cols = $header['cols'];
 
-        $cols['action']['options'] = [[
-            'name'    => '显示',
-            'action'  => 'show',
-            'display' => $this->access['show'],
-        ],[
+        $cols['actions']['options'] = [[
             'name'    => '编辑',
             'action'  => 'edit',
             'display' => $this->access['edit'],
         ]];
 
-        $search = $haeder['search_form'];
+        $search = $header['search_form'];
         $query = $search['query'];
 
         if (Request::method() == 'POST') {
-            $model = UserGroup::setBy($haeder);
-            foreach ($haeder['join'] as $join) {
+            $model = UserGroup::setBy($header);
+            foreach ($header['join'] as $join) {
                 $model->leftJoin($join[0], $join[1], $join[2], $join[3]);
             }
-            $model->orderBy($haeder['sort'], $haeder['order'])
+            $model->orderBy($header['sort'], $header['order'])
             ->orderBy('id', 'desc');
 
             foreach ($search['where'] as $where) {
@@ -54,31 +50,31 @@ class GroupController extends DefaultController
             }
 
             if ($query['export']) {
-                $rows = $model->get($haeder['select']);
+                $rows = $model->get($header['select']);
             } else {
-                $rows = $model->paginate($search['limit'], $haeder['select'])->appends($query);
+                $rows = $model->paginate($search['limit'], $header['select'])->appends($query);
             }
 
-            $items = Grid::dataFilter($rows, $haeder);
+            $items = Grid::dataFilter($rows, $header);
 
             if ($query['export']) {
-                unset($cols['action']);
-                writeExcel($cols, $items, $haeder['name']. date('Y-m-d'));
+                unset($cols['actions']);
+                writeExcel($cols, $items, $header['name']. date('Y-m-d'));
             }
 
             return $items->toJson();
         }
 
-        $haeder['buttons'] = [
+        $header['buttons'] = [
             ['name' => '删除', 'icon' => 'fa-remove', 'action' => 'delete', 'display' => $this->access['delete']],
         ];
-        $haeder['cols'] = $cols;
-        $haeder['tabs'] = User::$tabs;
-        $haeder['bys']  = UserGroup::$bys;
-        $haeder['js']   = Grid::js($haeder);
+        $header['cols'] = $cols;
+        $header['tabs'] = User::$tabs;
+        $header['bys']  = UserGroup::$bys;
+        $header['js']   = Grid::js($header);
 
         return $this->display([
-            'haeder' => $haeder,
+            'header' => $header,
         ]);
     }
 
@@ -105,15 +101,15 @@ class GroupController extends DefaultController
         $id = (int)Input::get('id');
         $group = UserGroup::find($id);
 
-        $options = [
+        $header = [
             'table' => 'user_group',
         ];
         if ($group->id) {
-            $options['row'] = $group;
+            $header['row'] = $group;
         }
-        $tpl = Form::make($options);
+        $header['tpl'] = Form::make($header);
         return $this->render([
-            'tpl' => $tpl,
+            'header' => $header,
         ], 'create');
     }
 

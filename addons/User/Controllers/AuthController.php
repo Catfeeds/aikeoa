@@ -125,7 +125,6 @@ class AuthController extends Controller
                     return $this->json('你的IP不在可访问范围，还能尝试登录'.$try_count.'次。');
                 }
 
-                $user->password_text = $gets['password'];
                 $user->save();
 
                 // 清除登录错误记录

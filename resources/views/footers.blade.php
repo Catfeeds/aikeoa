@@ -1,6 +1,6 @@
 <script>
 (function($) {
-    var table = '{{$haeder["table"]}}';
+    var table = '{{$header["table"]}}';
     var config = window[table];
     var search = config.search;
     search.advanced.el = $('#' + table + '-search-form-advanced').searchForm({

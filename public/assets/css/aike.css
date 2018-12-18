@@ -1516,42 +1516,73 @@ border: 1px solid #ddd;
 }
 
 /* 新样式表单 */
-.form-controller .form-group {
+.form-controller .form-group, 
+.show-controller .form-group {
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 0;
 }
 .form-controller .control-label,
-.form-controller .control-text {
+.form-controller .control-text,
+.show-controller .control-label,
+.show-controller .control-text {
     border-top: solid 1px #ddd;
     padding: 10px;
 }
-.form-controller .control-btn {
+.form-controller .control-btn,
+.show-controller .control-btn {
     border-top: solid 1px #ddd;
     padding: 0;
 }
-.form-controller .control-label {
+.form-controller .control-label,
+.show-controller .control-label {
     padding-top: 16px;
     display: block;
+    text-align: right;
 }
+.show-controller .control-label {
+    padding-top: 10px;
+}
+
 .form-controller .no-border .control-label,
-.form-controller .no-border .control-text {
+.form-controller .no-border .control-text,
+.show-controller .no-border .control-label,
+.show-controller .no-border .control-text {
     border-top: 0;
 }
+
 @media (max-width: 767px) {
-    .form-controller .control-label {
+    .form-controller .control-label,
+    .show-controller .control-label {
         padding-bottom: 5px;
+        text-align: left;
     }
-    .form-controller .control-text {
+    .form-controller .control-text,
+    .show-controller .control-text {
         border-top: 0;
         padding-top: 0;
     }
-    .form-controller .control-btn {
+    .form-controller .control-btn,
+    .show-controller .control-btn {
         padding-top: 10px;
     }
 }
 
-.layui-layer-title {
-    border-bottom: 1px solid #dee5e7 !important;
-    background-color: #f6f8f8 !important;
+.layui-layer-aikeoa {
+    background-color: #f0f3f4 !important;
+}
+
+.layui-layer-aikeoa .layui-layer-ico {
+    background: transparent;
+}
+
+.form-panel-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+}
+.form-panel-body {
+    margin: 10px;
+    margin-top: 60px;
 }

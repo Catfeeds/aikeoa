@@ -34,17 +34,17 @@ return [
                 "index" => [
                     "name" => "列表"
                 ],
-                "view" => [
+                "show" => [
                     "name" => "查看"
                 ],
-                "add" => [
+                "create" => [
                     "name" => "新建"
+                ],
+                "edit" => [
+                    "name" => "编辑"
                 ],
                 "delete" => [
                     "name" => "删除"
-                ],
-                "secret" => [
-                    "name" => "密钥"
                 ]
             ]
         ],

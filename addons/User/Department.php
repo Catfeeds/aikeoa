@@ -30,7 +30,7 @@ class Department extends BaseModel
         static $data = null;
 
         if ($data === null) {
-            $data = Department::orderBy('lft', 'asc')->get(['id', 'parent_id', 'title'])->toNested('title');
+            $data = Department::orderBy('lft', 'asc')->get(['id', 'parent_id', 'name'])->toNested('name');
         }
         return $departmentId > 0 ? $data[$departmentId] : $data;
     }
@@ -38,6 +38,6 @@ class Department extends BaseModel
     public function scopeDialog($q, $value)
     {
         return $q->whereIn('id', $value)
-        ->pluck('title', 'id');
+        ->pluck('name', 'id');
     }
 }

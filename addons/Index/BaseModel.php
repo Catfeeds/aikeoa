@@ -237,9 +237,9 @@ class BaseModel extends Eloquent
     /**
      * 设置by字段的筛选类型
      */
-    public function scopeSetBy($query, $haeder)
+    public function scopeSetBy($query, $header)
     {
-        $table = $haeder['table'];
+        $table = $header['table'];
         $by = Input::get('by');
         switch ($by) {
             // 我的客户

@@ -1,9 +1,9 @@
-{{$haeder["js"]}}
-<div class="panel b-a" id="{{$haeder['table']}}-controller">
+{{$header["js"]}}
+<div class="panel b-a" id="{{$header['table']}}-controller">
     @include('tabs2') 
-    @include('haeders')
+    @include('headers')
     <div class="list-jqgrid aike-jqgrid-tree">
-        <table id="{{$haeder['table']}}-grid"></table>
+        <table id="{{$header['table']}}-grid"></table>
     </div>
 </div>
 <script>
@@ -15,7 +15,7 @@
         }
     });
     
-    var table = '{{$haeder["table"]}}';
+    var table = '{{$header["table"]}}';
     var config = window[table];
     var action = config.action;
     var search = config.search;
@@ -23,13 +23,16 @@
     action.config = function(data) {
         var me = this;
         var url = app.url('user/role/config', {role_id: data.id});
-        var index = layer.open({
-            title: '<i class="fa fa-columns"></i> ' + me.name +'</a>',
+        layer.open({
+            // title: '<i class="fa fa-columns"></i> ' + me.name +'</a>',
+            title: false,
+            closeBtn: false,
+            area: ['100%', '100%'],
+            skin: 'layui-layer-aikeoa',
             type: 2,
             move: false,
             content: url,
         });
-        layer.full(index);
     }
 
     // 自定义搜索方法

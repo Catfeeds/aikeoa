@@ -1,6 +1,7 @@
 /node_modules
 /public/hot
 /public/storage
+/public/deploy.php
 /storage/*.key
 /vendor
 /.idea
@@ -16,4 +17,6 @@ yarn-error.log
 _ide_helper.php
 .phpstorm.meta.php
 .env
+yarn.lock
+composer.lock
 /nbproject/private/

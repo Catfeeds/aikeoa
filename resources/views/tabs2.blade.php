@@ -1,7 +1,7 @@
-@if($haeder['tabs'])
+@if($header['tabs'])
 <div class="panel-heading tabs-box">
     <ul class="nav nav-tabs">
-        @foreach($haeder['tabs']['items'] as $tab)
+        @foreach($header['tabs']['items'] as $tab)
         <?php 
             $tab_count = substr_count($tab['value'], '.');
             $module = Request::module();

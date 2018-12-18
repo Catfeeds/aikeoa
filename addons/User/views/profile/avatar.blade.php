@@ -1,7 +1,7 @@
 <div class="wrapper-sm">
     <div class="avatar-form">
         <div class="col-sm-9">
-            <div class="image-box" id="abcccccc">
+            <div class="image-box">
                 <img id="image" class="hide">
             </div>
         </div>

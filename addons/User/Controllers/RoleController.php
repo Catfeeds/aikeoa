@@ -23,13 +23,13 @@ class RoleController extends DefaultController
 
     public function indexAction()
     {
-        $haeder = Grid::haeder([
+        $header = Grid::header([
             'table'   => 'role',
             'referer' => 1,
             'search'  => ['by' => ''],
         ]);
 
-        $cols = $haeder['cols'];
+        $cols = $header['cols'];
         $cols = Grid::addCols($cols, 'name', [
             'label' => '用户数',
             'name'  => 'user_count',
@@ -46,7 +46,7 @@ class RoleController extends DefaultController
             'align'     => 'center'
         ];
         */
-        $cols['actionLink']['options'] = [[
+        $cols['actions']['options'] = [[
             'name'    => '编辑',
             'action'  => 'edit',
             'display' => $this->access['edit'],
@@ -56,12 +56,12 @@ class RoleController extends DefaultController
             'display' => $this->access['config'],
         ]];
 
-        $search = $haeder['search_form'];
+        $search = $header['search_form'];
         $query = $search['query'];
 
         if (Request::method() == 'POST') {
-            $model = Role::setBy($haeder);
-            foreach ($haeder['join'] as $join) {
+            $model = Role::setBy($header);
+            foreach ($header['join'] as $join) {
                 $model->leftJoin($join[0], $join[1], $join[2], $join[3]);
             }
             $model->leftJoin('user', 'user.role_id', '=', 'role.id');
@@ -73,25 +73,25 @@ class RoleController extends DefaultController
                 }
             }
 
-            $model->select($haeder['select'])
+            $model->select($header['select'])
             ->addSelect(DB::raw('role.parent_id,count(user.id) as user_count'))
             ->groupBy('role.id');
 
             $items = $model->get()->toNested();
-            $items = Grid::dataFilter($items, $haeder);
+            $items = Grid::dataFilter($items, $header);
             return $items->toJson();
         }
 
-        $haeder['buttons'] = [
+        $header['buttons'] = [
             ['name' => '删除', 'icon' => 'fa-remove', 'action' => 'delete', 'display' => $this->access['delete']],
         ];
-        $haeder['cols'] = $cols;
-        $haeder['tabs'] = User::$tabs;
-        $haeder['bys']  = Role::$bys;
-        $haeder['js']   = Grid::js($haeder);
+        $header['cols'] = $cols;
+        $header['tabs'] = User::$tabs;
+        $header['bys']  = Role::$bys;
+        $header['js']   = Grid::js($header);
 
         return $this->display([
-            'haeder' => $haeder,
+            'header' => $header,
         ]);
     }
 
@@ -138,7 +138,7 @@ class RoleController extends DefaultController
                     DB::table('user_asset')->where('id', $_asset['id'])->update($data);
                 }
             }
-            return $this->success('config', $query, '恭喜您，操作成功。', 0);
+            return $this->json('恭喜您，操作成功。', true);
         }
 
         if ($gets['clone_id']) {
@@ -185,21 +185,21 @@ class RoleController extends DefaultController
             // 重构树形结构
             Role::treeRebuild();
 
-            return $this->json('恭喜您，操作成功。', url_referer('index'));
+            return $this->json('恭喜您，操作成功。', true);
         }
 
         $id = (int)Input::get('id');
         $role = Role::find($id);
 
-        $options = [
+        $header = [
             'table' => 'role',
         ];
         if ($role->id) {
-            $options['row'] = $role;
+            $header['row'] = $role;
         }
-        $tpl = Form::make($options);
+        $header['tpl'] = Form::make($header);
         return $this->render([
-            'tpl' => $tpl,
+            'header' => $header,
         ], 'create');
     }
 
@@ -211,7 +211,7 @@ class RoleController extends DefaultController
     public function dialogAction()
     {
         $search = search_form([], [
-            ['text','role.title','名称'],
+            ['text','role.name','名称'],
             ['text','role.id','ID'],
         ]);
         $query = $search['query'];
@@ -221,7 +221,7 @@ class RoleController extends DefaultController
             $data = [];
             foreach ($rows as $row) {
                 $row['sid']  = 'r'.$row['id'];
-                $row['text'] = $row['layer_space'].$row['title'];
+                $row['text'] = $row['layer_space'].$row['name'];
                 $data[] = $row;
             }
             return response()->json(['data' => $data]);

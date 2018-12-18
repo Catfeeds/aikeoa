@@ -30,7 +30,7 @@ class Role extends BaseModel
         static $data = null;
 
         if ($data === null) {
-            $data = Role::orderBy('lft', 'asc')->get(['id', 'parent_id', 'name', 'title'])->toNested('title');
+            $data = Role::orderBy('lft', 'asc')->get(['id', 'parent_id', 'name', 'name'])->toNested('name');
         }
         return $roleId > 0 ? $data[$roleId] : $data;
     }
@@ -38,6 +38,6 @@ class Role extends BaseModel
     public function scopeDialog($q, $value)
     {
         return $q->whereIn('id', $value)
-        ->pluck('title', 'id');
+        ->pluck('name', 'id');
     }
 }

@@ -56,7 +56,7 @@
         if(params.multi == 0) {
             selected = {};
         }
-        selected[row[sid]] = row.title;
+        selected[row[sid]] = row.name;
         setSelected();
     }
 
@@ -87,6 +87,14 @@
                    }
                 }
             });
+        },
+        onDblClickRow: function(row) {
+            setRow(row);
+            if (sid == 'sid') {
+                $('#modal-dialog-search').dialog('close');
+            } else {
+                $('#modal-dialog-user').dialog('close');
+            }
         },
         onCheck: function(row) {
             setRow(row);
