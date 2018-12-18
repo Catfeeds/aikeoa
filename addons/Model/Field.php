@@ -546,9 +546,9 @@ class Field extends BaseModel
             '{I}'  => date('i', $time),
             '{S}'  => date('s', $time),
             '{U}'  => $user['nickname'],
-            '{UD}' => $user->department['title'],
-            '{UR}' => $user->role['title'],
-            '{UP}' => $user->position['title'],
+            '{UD}' => $user->department['name'],
+            '{UR}' => $user->role['name'],
+            '{UP}' => $user->position['name'],
         ];
 
         // 生成单据编码
@@ -585,9 +585,9 @@ class Field extends BaseModel
             '{S}'    => date('s', $time),
             'sys_nickname' => $user['nickname'],
             'sys_nickname_datetime' => $user['nickname'].' '.date('Y-m-d H:i'),
-            'sys_department_name'   => $user->department['title'],
-            '{UR}'   => $user->role['title'],
-            '{UP}'   => $user->position['title'],
+            'sys_department_name'   => $user->department['name'],
+            '{UR}'   => $user->role['name'],
+            '{UP}'   => $user->position['name'],
         ];
 
         if ($field['is_read']) {

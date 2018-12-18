@@ -12,13 +12,13 @@ class Dialog
         'role' => [
             'title' => '角色',
             'table' => 'role',
-            'field' => 'title',
+            'field' => 'name',
             'url'   => 'user/role/dialog',
         ],
         'department' => [
             'title' => '部门',
             'table' => 'department',
-            'field' => 'title',
+            'field' => 'name',
             'url'   => 'user/department/dialog',
         ],
         'supplier' => [

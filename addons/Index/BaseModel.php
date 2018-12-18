@@ -246,6 +246,14 @@ class BaseModel extends Eloquent
             case 'me':
                 $query->where($table.'.created_by', auth()->id());
                 break;
+            // 启用
+            case 'enabled':
+                $query->where($table.'.status', 1);
+                break;
+            // 禁用
+            case 'disabled':
+                $query->where($table.'.status', 0);
+                break;
             // 我的下属
             case 'sub':
                 break;

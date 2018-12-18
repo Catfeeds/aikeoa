@@ -205,7 +205,7 @@ class ArticleController extends DefaultController
         if ($scopes->count()) {
             $rows = [];
 
-            $departments = Department::orderBy('lft', 'asc')->pluck('title', 'id');
+            $departments = Department::orderBy('lft', 'asc')->pluck('name', 'id');
 
             foreach ($scopes as $scope) {
                 $read = isset($reads[$scope['id']]) ? 1 : 0;

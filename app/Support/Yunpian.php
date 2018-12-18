@@ -2,12 +2,14 @@
 
 class Yunpian
 {
-    public static $apikey = '85SBI86vm2aRih1AXVQMW1sjMgpfo5GM'; //4095b4b05c69359ff5d4659bf39ad3fc
+    public static $apikey = '85SBI86vm2aRih1AXVQMW1sjMgpfo5GM';
     public static $sign   = '【川南酿造】';
 
     public static function init()
     {
         $ch = curl_init();
+
+        // YUNPIAN_API_KEY
 
         /* 设置验证方式 */
         curl_setopt($ch, CURLOPT_HTTPHEADER, [

@@ -14,7 +14,7 @@ use DB;
 use App\Wechat\Work\Util;
 use App\Wechat\Work\AccessToken;
 
-class WxwrokToken
+class WeappToken
 {
     /**
     * Handle an incoming request.

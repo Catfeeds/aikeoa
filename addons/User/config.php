@@ -21,6 +21,11 @@ return [
             'model' => 'Aike\User\Role::Dialog',
             'url'   => 'user/role/dialog',
         ],
+        'position' => [
+            'name'  => '职位',
+            'model' => 'Aike\User\UserPosition::Dialog',
+            'url'   => 'user/position/dialog',
+        ],
         'user' => [
             'name'  => '用户',
             'model' => 'Aike\User\User::Dialog',

@@ -40,8 +40,8 @@ class User extends BaseModel implements
         'name'  => 'by',
         'items' => [
             ['value' => '', 'name' => '全部'],
-            ['value' => '1', 'name' => '启用'],
-            ['value' => '2', 'name' => '禁用'],
+            ['value' => 'enabled', 'name' => '启用'],
+            ['value' => 'disabled', 'name' => '禁用'],
             ['value' => 'divider'],
             ['value' => 'day', 'name' => '今日创建'],
             ['value' => 'week', 'name' => '本周创建'],

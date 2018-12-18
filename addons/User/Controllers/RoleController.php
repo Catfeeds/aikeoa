@@ -217,7 +217,15 @@ class RoleController extends DefaultController
         $query = $search['query'];
 
         if (Request::method() == 'POST') {
-            $rows = Role::orderBy('lft', 'asc')->get()->toNested();
+            $model = Role::orderBy('lft', 'asc');
+            
+            foreach ($search['where'] as $where) {
+                if ($where['active']) {
+                    $model->search($where);
+                }
+            }
+            
+            $rows = $model->get()->toNested();
             $data = [];
             foreach ($rows as $row) {
                 $row['sid']  = 'r'.$row['id'];

@@ -16,4 +16,11 @@ class UserPosition extends BaseModel
             ['value' => 'month', 'name' => '本月创建'],
         ]
     ];
+
+    public function scopeDialog($q, $value)
+    {
+        return $q->whereIn('id', $value)
+        ->pluck('name', 'id');
+    }
+
 }

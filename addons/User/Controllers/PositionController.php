@@ -134,6 +134,28 @@ class PositionController extends DefaultController
         ]);
     }
 
+    public function dialogAction()
+    {
+        $search = search_form([], [
+            ['text','user_position.name','名称'],
+            ['text','user_position.id','ID'],
+        ]);
+
+        if (Request::method() == 'POST') {
+            $model = UserPosition::orderBy('sort', 'asc');
+            foreach ($search['where'] as $where) {
+                if ($where['active']) {
+                    $model->search($where);
+                }
+            }
+            $rows = $model->get(['*', 'name as text']);
+            return response()->json(['data' => $rows]);
+        }
+        return $this->render([
+            'get' => Input::get()
+        ]);
+    }
+
     // 删除
     public function deleteAction()
     {

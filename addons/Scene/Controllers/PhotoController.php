@@ -211,7 +211,7 @@ class PhotoController extends DefaultController
     {
         // 返回json
         if (Request::wantsJson()) {
-            $datas = Department::orderBy('lft', 'asc')->get(['id', 'parent_id', 'title'])->toNested('title');
+            $datas = Department::orderBy('lft', 'asc')->get(['id', 'parent_id', 'name'])->toNested('name');
             $rows = [];
             foreach ($datas as $data) {
                 $rows[] = $data;

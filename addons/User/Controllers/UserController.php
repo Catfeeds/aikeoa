@@ -25,9 +25,9 @@ class UserController extends DefaultController
     public function indexAction()
     {
         $header = Grid::header([
-            'table'     => 'user',
-            'referer'   => 1,
-            'search'    => ['by' => ''],
+            'table'   => 'user',
+            'referer' => 1,
+            'search'  => ['by' => 'enabled'],
         ]);
 
         $cols = $header['cols'];
@@ -51,7 +51,8 @@ class UserController extends DefaultController
                 $model->leftJoin($join[0], $join[1], $join[2], $join[3]);
             }
             $model->orderBy($header['sort'], $header['order'])
-            ->orderBy('id', 'desc');
+            ->orderBy('user.id', 'desc')
+            ->where('user.group_id', 1);
 
             foreach ($search['where'] as $where) {
                 if ($where['active']) {

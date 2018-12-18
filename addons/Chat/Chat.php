@@ -123,7 +123,7 @@ class Chat
         $user = DB::table('user')
         ->leftJoin('role', 'role.id', '=', 'user.role_id')
         ->leftJoin('department', 'department.id', '=', 'user.department_id')
-        ->selectRaw('role.title as role,department.title as dept,user.id, user.username as account, user.nickname as realname, user.im_status as status, IF(user.admin=1,"super","no") as admin, user.gender, user.email, user.mobile')
+        ->selectRaw('role.name as role,department.name as dept,user.id, user.username as account, user.nickname as realname, user.im_status as status, IF(user.admin=1,"super","no") as admin, user.gender, user.email, user.mobile')
         ->where('user.id', $userID)
         ->first();
 
@@ -166,8 +166,8 @@ class Chat
         ->leftJoin('role', 'role.id', '=', 'user.role_id')
         ->leftJoin('department', 'department.id', '=', 'user.department_id')
         ->selectRaw('
-            role.title as role,
-            department.title as dept,
+            role.name as role,
+            department.name as dept,
             user.id, 
             user.username as account, 
             user.nickname as realname, 

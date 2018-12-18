@@ -212,7 +212,7 @@ class Workflow extends BaseModel
         ->LeftJoin('role', 'role.id', '=', 'user.role_id')
         ->LeftJoin('department', 'department.id', '=', 'user.department_id')
         ->where('user.id', $user_id)
-        ->first(['user.post as position', 'user.nickname as user_name', 'role.title as role_name', 'department.title as department_name']);
+        ->first(['user.post as position', 'user.nickname as user_name', 'role.name as role_name', 'department.name as department_name']);
     }
 
     // 转交工作
@@ -492,11 +492,11 @@ class Workflow extends BaseModel
         $process = DB::table('work_process')->where('id', $post['process_id'])->first();
 
         $start_user = Workflow::getMacroUser($process['start_user_id']);
-        $start_user['position_name'] = $position[$start_user['position']]['title'];
+        $start_user['position_name'] = $position[$start_user['position']]['name'];
 
         // 当前经办工作用户信息
         $current_user = Workflow::getMacroUser(Auth::id());
-        $current_user['position_name'] = $position[$current_user['position']]['title'];
+        $current_user['position_name'] = $position[$current_user['position']]['name'];
 
         $form_data = array();
         $form_data['[发起人姓名]'] = "\$start_user['user_name']";
@@ -923,26 +923,26 @@ class Workflow extends BaseModel
 
                             // 当前用户部门(长名称)
                             case "sys_department_name":
-                                $department = DB::table('department')->where('id', Auth::user()->department_id)->first(['id', 'title']);
-                                $auto_value = $department['title'];
+                                $department = DB::table('department')->where('id', Auth::user()->department_id)->first(['id', 'name']);
+                                $auto_value = $department['name'];
                                 break;
 
                             // 当前用户部门(短名称)
                             case "sys_department_short_name":
-                                $department = DB::table('department')->where('id', Auth::user()->department_id)->first(['id', 'title']);
-                                $auto_value = $department['title'];
+                                $department = DB::table('department')->where('id', Auth::user()->department_id)->first(['id', 'name']);
+                                $auto_value = $department['name'];
                                 break;
 
                             // 当前用户职位
                             case "sys_user_position":
-                                $position = DB::table('user_position')->where('id', Auth::user()->post)->first(['id', 'title']);
-                                $auto_value = $position['title'];
+                                $position = DB::table('user_position')->where('id', Auth::user()->post)->first(['id', 'name']);
+                                $auto_value = $position['name'];
                                 break;
 
                            // 当前用户辅助职位
                             case "sys_user_position_assist":
-                                $position = DB::table('user_position')->where('id', Auth::user()->position_assist_id)->first(['id', 'title']);
-                                $auto_value = $position['title'];
+                                $position = DB::table('user_position')->where('id', Auth::user()->position_assist_id)->first(['id', 'name']);
+                                $auto_value = $position['name'];
                                 break;
 
                             // 当前用户姓名+日期

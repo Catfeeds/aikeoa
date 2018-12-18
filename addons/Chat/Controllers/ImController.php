@@ -88,7 +88,7 @@ class ImController extends Controller
 
         $friends = [];
         foreach ($departments as $department) {
-            $friend = ['id' => $department['id'], 'groupname' => $department['title']];
+            $friend = ['id' => $department['id'], 'groupname' => $department['name']];
             $list = [];
             foreach ($department['users'] as $user) {
                 $list[] = [

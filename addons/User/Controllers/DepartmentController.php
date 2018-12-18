@@ -133,7 +133,17 @@ class DepartmentController extends DefaultController
         ]);
 
         if (Request::method() == 'POST') {
-            $rows = Department::orderBy('lft', 'asc')->get()->toNested();
+
+            $model = Department::orderBy('lft', 'asc');
+
+            foreach ($search['where'] as $where) {
+                if ($where['active']) {
+                    $model->search($where);
+                }
+            }
+            
+            $rows = $model->get()->toNested();
+
             $data  = [];
             foreach ($rows as $row) {
                 $row['sid'] = 'd'.$row['id'];

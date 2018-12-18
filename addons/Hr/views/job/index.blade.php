@@ -57,8 +57,8 @@
                         {{option('user.gender', $row->gender)}}
                     </td>
                     <!--
-                    <td align="center">{{$row->department->title}}</td>
-                    <td align="center">{{$row->role->title}}</td>
+                    <td align="center">{{$row->department->name}}</td>
+                    <td align="center">{{$row->role->name}}</td>
                     <td align="center">{{option('user.position', $row->post)}}</td>
                     -->
                     <td align="center">{{$row->name}}</td>

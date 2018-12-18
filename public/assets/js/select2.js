@@ -18,7 +18,7 @@ var select2List = {};
                 delay: 250,
                 data: function (params) {
                     return {
-                        field_0: options.search_key + '.name',
+                        field_0: 'name',
                         condition_0: 'like',
                         search_0: params.term,
                         page: params.page
@@ -46,7 +46,7 @@ var select2List = {};
                 if(m.remark == undefined) {
                     return m.text;
                 }
-                return m.title;
+                return m.name;
             }
         };
 

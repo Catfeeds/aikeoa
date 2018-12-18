@@ -203,6 +203,8 @@ class Grid
                     $col['minWidth'] = 120;
                 } elseif ($setting['width']) {
                     $col['width'] = (int)$setting['width'];
+                } else {
+                    $col['width'] = 100;
                 }
                 $res['cols'][$field['field']] = $col;
 

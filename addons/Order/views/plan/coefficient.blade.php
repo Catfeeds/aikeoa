@@ -32,7 +32,7 @@
 
  @if($month_data) @foreach($month_data as $k => $value)
 <tr>
-    <td align="center"> @if($k==0) 课部管理 @else {{get_department($k,'title')}} @endif </td>
+    <td align="center"> @if($k==0) 课部管理 @else {{get_department($k,'name')}} @endif </td>
          @if($value) @foreach($value as $v)
             <td align="center">{{number_format($v, 2)}}</td>
          @endforeach @endif

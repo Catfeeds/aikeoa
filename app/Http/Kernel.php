@@ -38,7 +38,7 @@ class Kernel extends HttpKernel
 
             \App\Http\Middleware\Cors::class,
             \App\Http\Middleware\Token::class,
-            //\App\Http\Middleware\WxwrokToken::class,
+            //\App\Http\Middleware\WeappToken::class,
         ],
 
         'api' => [

@@ -130,13 +130,13 @@ class HrController extends DefaultController
             'join'   => 'user on user.id = hr.user_id',
             'label'  => '姓名',
         ],[
-            'name'   => 'department_title',
-            'index'  => 'department.title as department_title',
+            'name'   => 'department_name',
+            'index'  => 'department.name as department_name',
             'join'   => 'department on department.id = user.department_id',
             'label'  => '部门',
         ],[
-            'name'   => 'user_position_title',
-            'index'  => 'user_position.title as user_position_title',
+            'name'   => 'user_position_name',
+            'index'  => 'user_position.name as user_position_name',
             'join'   => 'user_position on user_position.id = user.post',
             'label'  => '职位',
         ],[
